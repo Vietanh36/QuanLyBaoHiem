@@ -20,7 +20,7 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+            overflow: visible;
         }
         header {
             background: linear-gradient(90deg, #007bff, #0056b3);
@@ -197,6 +197,17 @@
     margin-bottom: 5px;
     font-weight: 500;
 }
+.search-wrapper {
+    position: sticky;
+    top: 20px;
+    z-index: 1000;
+    background: white;
+    padding: 10px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
 
 .form-group input,
 .form-group textarea {
@@ -240,21 +251,21 @@
                 <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
             </div>
 
-            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="searchInput" class="search-box" style="flex: 1;"
-                       placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng bảo hiểm, note..."
-                       onkeyup="searchTable()">
-                
-                <button onclick="refreshTable()" 
-                        style="padding: 10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer; white-space: nowrap;">
-                    🔄 Cập nhật trạng thái
-                </button>
-                
-                <button onclick="loadData()" 
-                        style="padding: 10px 22px; background:#6c757d; color:white; border:none; border-radius:8px; cursor:pointer; white-space: nowrap;">
-                    🔄 Tải lại dữ liệu
-                </button>
-            </div>
+           <div class="search-wrapper">
+    <input type="text" id="searchInput" class="search-box"
+        placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng bảo hiểm, note..."
+        onkeyup="searchTable()">
+
+    <button onclick="refreshTable()"
+        style="padding: 10px 22px; background:#17a2b8; color:white;">
+        🔄 Cập nhật trạng thái
+    </button>
+
+    <button onclick="loadData()"
+        style="padding: 10px 22px; background:#6c757d; color:white;">
+        🔁 Tải lại dữ liệu
+    </button>
+</div>
 
             <div style="overflow-x:auto;">
                 <table id="insuranceTable">
