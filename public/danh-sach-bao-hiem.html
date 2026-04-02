@@ -376,6 +376,14 @@
                       "3. Mở F12 → Console để xem lỗi chi tiết.");
             }
         }
+        // Load lần đầu khi mở trang
+loadData();
+
+// 👉 Tự reload khi quay lại tab
+window.addEventListener("focus", function () {
+    console.log("🔄 Quay lại tab → reload data");
+    loadData();
+});
 
         function renderTable(filteredList = null) {
             const tbody = document.getElementById('tableBody');
