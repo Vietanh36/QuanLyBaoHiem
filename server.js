@@ -95,6 +95,12 @@ app.delete('/api/baohiem/:id', async (req, res) => {
 // ==================== KHỞI ĐỘNG SERVER ====================
 
 const PORT = process.env.PORT || 3000;
+// Thêm route gốc để test
+app.get('/', (req, res) => {
+    res.send('🚀 Server đang chạy thành công trên Render!');
+    // Hoặc nếu bạn muốn redirect sang trang chính:
+    // res.redirect('/api/login');   // thay bằng route thực tế của bạn
+});
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server đang chạy tại port ${PORT}`);
     console.log(`🌐 Local: http://localhost:${PORT}`);
