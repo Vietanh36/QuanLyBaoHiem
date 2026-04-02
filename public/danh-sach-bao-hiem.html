@@ -324,7 +324,7 @@
         async function loadData() {
             try {
                 console.log("🔄 Đang tải dữ liệu từ server...");
-                const res = await fetch("http://localhost:3000/api/baohiem", {
+                const res = await fetch('/api/baohiem', {
                     method: "GET",
                     headers: { "Content-Type": "application/json" }
                 });
@@ -478,7 +478,7 @@
             if (!confirm("Bạn có chắc chắn muốn xóa bảo hiểm này không?")) return;
 
             try {
-                const res = await fetch(`http://localhost:3000/api/baohiem/${id}`, {
+                const res = await fetch(`/api/baohiem/${id}`, {
                     method: "DELETE"
                 });
 
