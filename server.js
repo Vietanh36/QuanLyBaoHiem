@@ -32,29 +32,28 @@ pool.query('SELECT NOW()')
 
 // ==================== API ROUTES ====================
 
-// GET: Lấy danh sách bảo hiểm
 app.get('/api/baohiem', async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT 
                 id,
-                tenKhach,
+                tenkhach   AS "tenKhach",
                 sdt,
-                diaChi,
-                ngayCap,
-                ngayHetHan,
-                hangBH,
-                loaiXe,
-                bienSo,
+                diachi     AS "diaChi",
+                ngaycap    AS "ngayCap",
+                ngayhethan AS "ngayHetHan",
+                hangbh     AS "hangBH",
+                loaixe     AS "loaiXe",
+                bienso     AS "bienSo",
                 vin,
                 note
             FROM baohiemoto 
-            ORDER BY ngayHetHan ASC
+            ORDER BY ngayhethan ASC
         `);
 
         res.json(result.rows);
     } catch (err) {
-        console.error(err);
+        console.error("GET ERROR:", err);
         res.status(500).json({ message: "Lỗi lấy dữ liệu" });
     }
 });
@@ -71,10 +70,10 @@ app.post('/api/baohiem', async (req, res) => {
         } = req.body;
 
         await pool.query(`
-            INSERT INTO baohiemoto 
-            (tenKhach, sdt, diaChi, ngayCap, ngayHetHan, hangBH, loaiXe, bienSo, vin, note)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-        `, [tenKhach, sdt, diaChi, ngayCap, ngayHetHan, hangBH, loaiXe, bienSo, vin, note || null]);
+    INSERT INTO baohiemoto 
+    (tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, vin, note)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+`, [tenKhach, sdt, diaChi, ngayCap, ngayHetHan, hangBH, loaiXe, bienSo, vin, note || null]);
 
         res.json({ success: true, message: "Thêm thành công!" });
 
