@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Bảo Hiểm Ô Tô</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+      
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .nav-btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-home { background: #28a745; }
+        .btn-add { background: #007bff; }
+
+        .notification-bar {
+            background: #d32f2f;
+            color: white;
+            padding: 15px 25px;
+            margin: 20px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+        }
+        .main { padding: 30px; }
+        .search-box {
+            width: 100%;
+            max-width: 450px;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #ddd;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        th {
+            background: #007bff;
+            color: white;
+            position: relative;
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            min-width: 145px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .con-han { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .sap-het { 
+            background: #fff3cd; 
+            color: #856404; 
+            border: 1px solid #ffeaa7;
+            animation: pulse 2s infinite; 
+        }
+        .het-han { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        tr.sap-het-han { background: #fff3cd !important; }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 6px;
+            font-size: 14px;
+        }
+        .edit-btn { background: #ffc107; color: #212529; }
+        .delete-btn { background: #dc3545; color: white; }
+
+        .filter-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .note-cell {
+            cursor: pointer;
+            min-width: 180px;
+            max-width: 250px;
+            white-space: pre-wrap;
+        }
+        .note-cell:hover { background-color: #f8f9fa; }
+        .note-input {
+            width: 100%;
+            height: 80px;
+            padding: 8px;
+            border: 2px solid #007bff;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .modal h2 { margin-top: 0; color: #007bff; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .form-group textarea { height: 80px; resize: vertical; }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .btn-cancel { background: #6c757d; color: white; }
+        .btn-save { background: #28a745; color: white; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🚗 Danh Sách Bảo Hiểm Ô Tô</div>
+            <div class="nav-buttons">
+                <button onclick="switchToHome()" class="nav-btn btn-home">🏠 Trang Chủ</button>
+                <button onclick="switchToAdd()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
+            </div>
+        </header>
+
+        <div class="main">
+            <div id="notificationBar" class="notification-bar">
+                🚨 CÓ <span id="countExpiring" style="font-size:22px; font-weight:bold"></span>
+                BẢO HIỂM SẮP HẾT HẠN (còn dưới 30 ngày)
+                <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
+            </div>
+
+            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="searchInput" class="search-box" style="flex: 1;"
+                       placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng bảo hiểm, note..."
+                       onkeyup="searchTable()">
+                
+                <button onclick="refreshTable()" 
+                        style="padding: 10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer; white-space: nowrap;">
+                    🔄 Cập nhật trạng thái
+                </button>
+                
+                <button onclick="loadData()" 
+                        style="padding: 10px 22px; background:#6c757d; color:white; border:none; border-radius:8px; cursor:pointer; white-space: nowrap;">
+                    🔄 Tải lại dữ liệu
+                </button>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table id="insuranceTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên khách hàng</th>
+                            <th>SĐT</th>
+                            <th>Ngày cấp</th>
+                            <th>Ngày hết hạn</th>
+                            <th>Hãng BH</th>
+                            <th>Loại xe</th>
+                            <th>Biển số</th>
+                            <th>Note (Click để sửa)</th>
+                            <th>Trạng thái <button class="filter-btn" onclick="toggleFilter()">▼</button></th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="text-align:center; padding:25px; background:#f8f9fa;">
+            <button onclick="exportData()" style="background:#007bff; color:white; padding:12px 30px; border:none; border-radius:8px; font-size:16px; cursor:pointer;">
+                📤 Xuất File Excel (CSV)
+            </button>
+        </div>
+    </div>
+
+    <!-- Popup Sửa -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label>Tên khách hàng</label>
+                <input type="text" id="editTenKhach">
+            </div>
+            <div class="form-group">
+                <label>Số điện thoại</label>
+                <input type="text" id="editSdt">
+            </div>
+            <div class="form-group">
+                <label>Ngày cấp</label>
+                <input type="date" id="editNgayCap">
+            </div>
+            <div class="form-group">
+                <label>Ngày hết hạn</label>
+                <input type="date" id="editNgayHetHan">
+            </div>
+            <div class="form-group">
+                <label>Hãng bảo hiểm</label>
+                <input type="text" id="editHangBH">
+            </div>
+            <div class="form-group">
+                <label>Loại xe</label>
+                <input type="text" id="editLoaiXe">
+            </div>
+            <div class="form-group">
+                <label>Biển số xe</label>
+                <input type="text" id="editBienSo" style="text-transform:uppercase;">
+            </div>
+            <div class="form-group">
+                <label>Ghi chú (Note)</label>
+                <textarea id="editNote"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+                <button class="btn-save" onclick="saveEdit()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let danhSachBaoHiem = [];
+        let trangThaiFilter = "ALL";
+        let sapXepTheoNgay = null;
+
+        function getTrangThai(ngayHetHan) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const hetHan = new Date(ngayHetHan);
+            hetHan.setHours(0, 0, 0, 0);
+            const diffDays = Math.ceil((hetHan - today) / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) return { text: "HẾT HẠN", class: "het-han" };
+            if (diffDays <= 30) return { text: `SẮP HẾT (${diffDays} ngày)`, class: "sap-het" };
+            return { text: `CÒN HẠN (${diffDays} ngày)`, class: "con-han" };
+        }
+
+        async function loadData() {
+            try {
+                console.log("🔄 Đang tải dữ liệu từ server...");
+                const res = await fetch("http://localhost:3000/api/baohiem", {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                console.log("📡 Status:", res.status, res.statusText);
+
+                if (!res.ok) {
+                    throw new Error(`Lỗi server: ${res.status} ${res.statusText}`);
+                }
+
+                const data = await res.json();
+                console.log("✅ Nhận được dữ liệu:", data.length, "bản ghi");
+
+                danhSachBaoHiem = data;
+                renderTable();
+                checkThongBaoDo();
+
+            } catch (err) {
+                console.error("❌ Lỗi loadData:", err);
+                alert("❌ Không lấy được dữ liệu từ server!\n\n" +
+                      "Kiểm tra:\n" +
+                      "1. Server Node.js có đang chạy ở port 3000 không?\n" +
+                      "2. Đã thêm CORS chưa?\n" +
+                      "3. Mở F12 → Console để xem lỗi chi tiết.");
+            }
+        }
+
+        function renderTable(filteredList = null) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            let listToRender = filteredList || danhSachBaoHiem;
+
+            if (trangThaiFilter !== "ALL") {
+                listToRender = listToRender.filter(item => {
+                    const st = getTrangThai(item.ngayHetHan);
+                    return (trangThaiFilter === "HET_HAN" && st.class === "het-han") ||
+                           (trangThaiFilter === "SAP_HET" && st.class === "sap-het") ||
+                           (trangThaiFilter === "CON_HAN" && st.class === "con-han");
+                });
+            }
+
+            if (sapXepTheoNgay) {
+                const today = new Date();
+                listToRender.sort((a, b) => {
+                    const diffA = Math.ceil((new Date(a.ngayHetHan) - today) / (1000*60*60*24));
+                    const diffB = Math.ceil((new Date(b.ngayHetHan) - today) / (1000*60*60*24));
+                    return sapXepTheoNgay === 'desc' ? diffB - diffA : diffA - diffB;
+                });
+            }
+
+            listToRender.forEach((item, index) => {
+                const status = getTrangThai(item.ngayHetHan);
+                const rowClass = status.class === "sap-het" ? "sap-het-han" : "";
+
+                const row = document.createElement('tr');
+                row.className = rowClass;
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${item.tenKhach || ''}</strong></td>
+                    <td>${item.sdt || ''}</td>
+                    <td>${formatDate(item.ngayCap)}</td>
+                    <td><strong>${formatDate(item.ngayHetHan)}</strong></td>
+                    <td>${item.hangBH || ''}</td>
+                    <td>${item.loaiXe || ''}</td>
+                    <td style="text-transform:uppercase; font-weight:500;">${item.bienSo || ''}</td>
+                    <td class="note-cell" onclick="editNoteInline(this, ${item.id})">${item.note || '<i style="color:#aaa;">(Chưa có ghi chú)</i>'}</td>
+                    <td><span class="status ${status.class}">${status.text}</span></td>
+                    <td>
+                        <button onclick="editBaoHiem(${item.id})" class="action-btn edit-btn">✏️ Sửa</button>
+                        <button onclick="xoaBaoHiem(${item.id})" class="action-btn delete-btn">🗑️ Xóa</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleDateString('vi-VN', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+        }
+
+        function editNoteInline(cell, id) {
+            const currentNote = cell.textContent.trim() === '(Chưa có ghi chú)' ? '' : cell.textContent.trim();
+            const input = document.createElement('textarea');
+            input.className = 'note-input';
+            input.value = currentNote;
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            input.focus();
+
+            function saveNote() {
+                const newNote = input.value.trim();
+                const item = danhSachBaoHiem.find(x => x.id === id);
+                if (item) item.note = newNote;
+                renderTable();
+            }
+
+            input.addEventListener('blur', saveNote);
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    saveNote();
+                }
+            });
+        }
+
+        function editBaoHiem(id) {
+            const item = danhSachBaoHiem.find(x => x.id === id);
+            if (!item) return;
+
+            document.getElementById('editId').value = item.id;
+            document.getElementById('editTenKhach').value = item.tenKhach || '';
+            document.getElementById('editSdt').value = item.sdt || '';
+            document.getElementById('editNgayCap').value = item.ngayCap || '';
+            document.getElementById('editNgayHetHan').value = item.ngayHetHan || '';
+            document.getElementById('editHangBH').value = item.hangBH || '';
+            document.getElementById('editLoaiXe').value = item.loaiXe || '';
+            document.getElementById('editBienSo').value = item.bienSo || '';
+            document.getElementById('editNote').value = item.note || '';
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveEdit() {
+            const id = parseInt(document.getElementById('editId').value);
+            const item = danhSachBaoHiem.find(x => x.id === id);
+            if (!item) return;
+
+            item.tenKhach = document.getElementById('editTenKhach').value.trim();
+            item.sdt = document.getElementById('editSdt').value.trim();
+            item.ngayCap = document.getElementById('editNgayCap').value;
+            item.ngayHetHan = document.getElementById('editNgayHetHan').value;
+            item.hangBH = document.getElementById('editHangBH').value.trim();
+            item.loaiXe = document.getElementById('editLoaiXe').value.trim();
+            item.bienSo = document.getElementById('editBienSo').value.trim().toUpperCase();
+            item.note = document.getElementById('editNote').value.trim();
+
+            closeModal();
+            renderTable();
+            alert("✅ Đã lưu thay đổi thành công!");
+        }
+
+        async function xoaBaoHiem(id) {
+            if (!confirm("Bạn có chắc chắn muốn xóa bảo hiểm này không?")) return;
+
+            try {
+                const res = await fetch(`http://localhost:3000/api/baohiem/${id}`, {
+                    method: "DELETE"
+                });
+
+                if (res.ok) {
+                    alert("✅ Đã xóa thành công!");
+                    loadData();
+                } else {
+                    alert("❌ Xóa thất bại!");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ Lỗi kết nối khi xóa");
+            }
+        }
+
+        function toggleFilter() {
+            let existingMenu = document.getElementById('filterMenu');
+            if (existingMenu) existingMenu.remove();
+
+            const menu = document.createElement('div');
+            menu.id = 'filterMenu';
+            menu.style.cssText = `position: absolute; background: white; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); padding: 8px 0; z-index: 1000; min-width: 240px; font-size: 15px;`;
+
+            const rect = event.currentTarget.getBoundingClientRect();
+            menu.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+            menu.style.left = (rect.left + window.scrollX - 10) + 'px';
+
+            menu.innerHTML = `
+                <div style="padding: 10px 16px; font-weight: 600; color: #007bff;">Lọc theo trạng thái</div>
+                <div onclick="applyFilter('ALL')" style="padding:12px 20px; cursor:pointer;">📋 Tất cả</div>
+                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
+                <div onclick="applySort('desc')" style="padding:12px 20px; cursor:pointer;">🔽 Còn hạn nhiều ngày nhất</div>
+                <div onclick="applySort('asc')" style="padding:12px 20px; cursor:pointer;">🔼 Còn hạn ít ngày nhất</div>
+                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
+                <div onclick="applyFilter('CON_HAN')" style="padding:12px 20px; cursor:pointer;">🟢 Còn hạn</div>
+                <div onclick="applyFilter('SAP_HET')" style="padding:12px 20px; cursor:pointer;">🟡 Sắp hết hạn</div>
+                <div onclick="applyFilter('HET_HAN')" style="padding:12px 20px; cursor:pointer;">🔴 Hết hạn</div>
+            `;
+
+            document.body.appendChild(menu);
+
+            setTimeout(() => {
+                const closeMenu = (e) => {
+                    if (!menu.contains(e.target)) {
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                    }
+                };
+                document.addEventListener('click', closeMenu);
+            }, 10);
+        }
+
+        function applyFilter(filterType) {
+            trangThaiFilter = filterType;
+            sapXepTheoNgay = null;
+            if (document.getElementById('filterMenu')) document.getElementById('filterMenu').remove();
+            renderTable();
+        }
+
+        function applySort(sortType) {
+            sapXepTheoNgay = sortType;
+            trangThaiFilter = "CON_HAN";
+            if (document.getElementById('filterMenu')) document.getElementById('filterMenu').remove();
+            renderTable();
+        }
+
+        function checkThongBaoDo() {
+            const today = new Date();
+            let count = danhSachBaoHiem.filter(item => {
+                const diff = Math.ceil((new Date(item.ngayHetHan) - today) / (1000*60*60*24));
+                return diff > 0 && diff <= 30;
+            }).length;
+
+            const bar = document.getElementById('notificationBar');
+            if (count > 0) {
+                document.getElementById('countExpiring').textContent = count;
+                bar.style.display = 'flex';
+            } else {
+                bar.style.display = 'none';
+            }
+        }
+
+        function hideNotification() {
+            document.getElementById('notificationBar').style.display = 'none';
+        }
+
+        function searchTable() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!keyword) return renderTable();
+
+            const filtered = danhSachBaoHiem.filter(item =>
+                (item.tenKhach || '').toLowerCase().includes(keyword) ||
+                (item.sdt || '').includes(keyword) ||
+                (item.bienSo || '').toLowerCase().includes(keyword) ||
+                (item.hangBH || '').toLowerCase().includes(keyword) ||
+                (item.note || '').toLowerCase().includes(keyword)
+            );
+            renderTable(filtered);
+        }
+
+        function exportData() {
+            let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
+            const today = new Date();
+
+            danhSachBaoHiem.forEach((item, i) => {
+                const status = getTrangThai(item.ngayHetHan);
+                csv += `${i+1},"${item.tenKhach || ''}","${item.sdt || ''}",${item.ngayCap || ''},${item.ngayHetHan || ''},"${item.hangBH || ''}","${item.loaiXe || ''}","${item.bienSo || ''}","${item.note || ''}","${status.text}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `BaoHiem_Oto_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            alert("✅ Đã xuất file Excel thành công!");
+        }
+
+        function switchToHome() {
+            const homeWindow = window.open("trangchu.html", "trangchu");
+            if (homeWindow) homeWindow.focus();
+        }
+
+        function switchToAdd() {
+            const homeWindow = window.open("trangchu.html", "trangchu");
+            if (homeWindow) homeWindow.focus();
+        }
+
+        function refreshTable() {
+            renderTable();
+            alert("✅ Trạng thái đã được cập nhật theo ngày hiện tại!");
+        }
+
+        // Tự động tải dữ liệu khi mở trang
+        window.onload = loadData;
+    </script>
+</body>
+</html>

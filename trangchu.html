@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Quản Lý Bảo Hiểm Ô Tô</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+       
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        h1 { text-align: center; color: #007bff; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 40px; font-size: 18px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: 500; margin-bottom: 8px; color: #333; }
+        .required::after { content: " *"; color: red; }
+        input { padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        input:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.2); }
+        .btn {
+            background: #28a745; color: white; border: none; padding: 14px 30px;
+            border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; margin: 10px 5px;
+        }
+        .btn:hover { background: #218838; transform: translateY(-2px); }
+        .btn-view { background: #007bff; }
+        .btn-view:hover { background: #0056b3; }
+        .button-group { text-align: center; margin-top: 30px; }
+        .error { color: red; font-size: 14px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quản Lý Bảo Hiểm Ô Tô</h1>
+        <p class="subtitle">Bảo hiểm xe hơi - Thời hạn 1 năm</p>
+       
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="required">Tên khách hàng</label>
+                <input type="text" id="tenKhach" placeholder="Nguyễn Văn A">
+                <div id="error-tenKhach" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label class="required">Số điện thoại</label>
+                <input type="tel" id="sdt" placeholder="0987 654 321">
+                <div id="error-sdt" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label>Địa chỉ</label>
+                <input type="text" id="diaChi" placeholder="Lao Cai, Việt Nam">
+            </div>
+            <div class="form-group">
+                <label class="required">Ngày cấp bảo hiểm</label>
+                <input type="date" id="ngayCap" onchange="autoTinhNgayHetHan()">
+                <div id="error-ngayCap" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label>Ngày hết hạn (tự động +1 năm)</label>
+                <input type="date" id="ngayHetHan" readonly>
+            </div>
+            <div class="form-group">
+                <label class="required">Hãng bảo hiểm</label>
+                <input type="text" id="hangBaoHiem" placeholder="Ví dụ: Bảo Việt, PTI, Liberty, MIC...">
+                <div id="error-hangBaoHiem" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label>Loại xe</label>
+                <input type="text" id="loaiXe" placeholder="Toyota Camry, Honda CR-V...">
+            </div>
+            <div class="form-group">
+                <label class="required">Biển số xe</label>
+                <input type="text" id="bienSo" placeholder="30A-123.45" style="text-transform: uppercase;">
+                <div id="error-bienSo" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label>Số khung (VIN)</label>
+                <input type="text" id="soKhung" placeholder="VF3...">
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="themBaoHiem()" class="btn">✅ Thêm Bảo Hiểm</button>
+            <a href="danh-sach-bao-hiem.html" 
+               class="btn btn-view" 
+               style="text-decoration:none; display:inline-block;"
+               target="_blank">
+                📋 Xem Danh Sách Bảo Hiểm
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function autoTinhNgayHetHan() {
+            const ngayCap = document.getElementById('ngayCap').value;
+            const ngayHetHan = document.getElementById('ngayHetHan');
+            if (ngayCap) {
+                let date = new Date(ngayCap);
+                date.setFullYear(date.getFullYear() + 1);
+                ngayHetHan.value = date.toISOString().slice(0,10);
+            }
+        }
+
+        function validateForm() {
+            let isValid = true;
+            document.querySelectorAll('.error').forEach(el => el.textContent = '');
+
+            if (!document.getElementById('tenKhach').value.trim()) {
+                document.getElementById('error-tenKhach').textContent = "Vui lòng nhập tên khách hàng!";
+                isValid = false;
+            }
+            if (!document.getElementById('sdt').value.trim()) {
+                document.getElementById('error-sdt').textContent = "Vui lòng nhập số điện thoại!";
+                isValid = false;
+            }
+            if (!document.getElementById('ngayCap').value) {
+                document.getElementById('error-ngayCap').textContent = "Vui lòng chọn ngày cấp bảo hiểm!";
+                isValid = false;
+            }
+            if (!document.getElementById('hangBaoHiem').value.trim()) {
+                document.getElementById('error-hangBaoHiem').textContent = "Vui lòng nhập hãng bảo hiểm!";
+                isValid = false;
+            }
+            if (!document.getElementById('bienSo').value.trim()) {
+                document.getElementById('error-bienSo').textContent = "Vui lòng nhập biển số xe!";
+                isValid = false;
+            }
+            return isValid;
+        }
+
+        function checkTrungBienSo(bienSoMoi) {
+            let danhSach = JSON.parse(localStorage.getItem('danhSachBaoHiem')) || [];
+            return danhSach.some(item => item.bienSo && item.bienSo.toUpperCase() === bienSoMoi.toUpperCase());
+        }
+
+        async function themBaoHiem() {
+    if (!validateForm()) return;
+
+    const data = {
+        tenKhach: document.getElementById('tenKhach').value.trim(),
+        sdt: document.getElementById('sdt').value.trim(),
+        diaChi: document.getElementById('diaChi').value.trim(),
+        ngayCap: document.getElementById('ngayCap').value,
+        ngayHetHan: document.getElementById('ngayHetHan').value,
+        hangBH: document.getElementById('hangBaoHiem').value.trim(),
+        loaiXe: document.getElementById('loaiXe').value.trim(),
+        bienSo: document.getElementById('bienSo').value.trim().toUpperCase(),
+        soKhung: document.getElementById('soKhung').value.trim(),
+        note: ""
+    };
+
+    try {
+        const res = await fetch("http://localhost:3000/api/baohiem", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            alert("✅ Thêm thành công!");
+            document.querySelectorAll('input').forEach(i => i.value = '');
+        } else {
+            alert("❌ Lỗi thêm dữ liệu!");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ Không kết nối được server!");
+    }
+}
+    </script>
+</body>
+</html>
