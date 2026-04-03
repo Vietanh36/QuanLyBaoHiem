@@ -3,74 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Bảo Hiểm Ô Tô</title>
+    <title>Quản Lý Bảo Hiểm Ô Tô - Full Chức Năng</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         
-        body { font-family: 'Roboto', sans-serif; background: #f4f7f9; margin:0; padding:0; color: #333; }
+        body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:0; color: #333; }
         
-        /* CỐ ĐỊNH HEADER */
+        /* HEADER CỐ ĐỊNH */
         header { 
             background: #007bff; color: white; padding: 15px 25px; 
             display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 1100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        .container { max-width: 1700px; margin: 0 auto; padding: 20px; }
 
-        /* THANH ĐIỀU KHIỂN CỐ ĐỊNH */
+        .container { max-width: 100%; margin: 0 auto; padding: 20px; box-sizing: border-box; }
+
+        /* THÔNG BÁO */
+        #alertBox {
+            background: #ff4d4f; color: white; padding: 15px; border-radius: 8px;
+            margin-bottom: 20px; display: none; align-items: center; justify-content: space-between;
+        }
+
+        /* THANH CÔNG CỤ CỐ ĐỊNH */
         .sticky-tools {
             position: sticky; top: 65px; z-index: 1000;
-            background: #f4f7f9; padding: 10px 0;
+            background: #f0f2f5; padding: 10px 0;
         }
 
         .controls { 
             display: flex; gap: 15px; padding: 15px;
             background: white; border-radius: 10px; border: 1px solid #e0e6ed;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            align-items: center;
         }
         
-        .search-box { flex: 1; padding: 12px 25px; border-radius: 30px; border: 1px solid #ddd; outline: none; font-size: 15px; }
-        .btn { padding: 10px 22px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: white; transition: 0.2s; }
+        .search-box { flex: 1; padding: 12px 20px; border-radius: 30px; border: 1px solid #ddd; outline: none; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: white; transition: 0.2s; }
         .btn-add { background: #28a745; }
         .btn-refresh { background: #17a2b8; border-radius: 30px; }
 
-        /* BẢNG VỚI TIÊU ĐỀ CỐ ĐỊNH */
+        /* BẢNG DỮ LIỆU - SỬA LỖI VỠ GIAO DIỆN */
         .table-wrapper { 
             background: white; border-radius: 10px; border: 1px solid #e0e6ed; 
-            overflow-x: auto; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow-x: auto; margin-top: 10px;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 1300px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1400px; table-layout: fixed; }
         
         thead th { 
-            background: #007bff; color: white; padding: 15px 12px; text-align: left; 
-            position: sticky; top: 135px; z-index: 900; 
-            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.1);
+            background: #007bff; color: white; padding: 15px 10px; text-align: left; 
+            position: sticky; top: 135px; z-index: 900;
         }
 
-        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        td { padding: 15px 10px; border-bottom: 1px solid #eee; font-size: 14px; word-wrap: break-word; }
         tr:hover { background-color: #f8fbff; }
-        
-        /* Trạng thái */
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; min-width: 110px; text-align: center; }
+
+        /* Cố định độ rộng cột để không bị lệch */
+        .col-stt { width: 50px; text-align: center; }
+        .col-name { width: 150px; font-weight: bold; }
+        .col-address { width: 200px; }
+        .col-phone { width: 120px; }
+        .col-date { width: 110px; }
+        .col-brand { width: 100px; }
+        .col-type { width: 100px; }
+        .col-plate { width: 110px; }
+        .col-status { width: 140px; }
+        .col-action { width: 130px; text-align: center; }
+
+        /* Trạng thái Badge */
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; min-width: 100px; text-align: center; }
         .st-conhan { background: #e6fcf5; color: #099268; }
         .st-saphet { background: #fff9db; color: #f08c00; }
         .st-hethan { background: #fff5f5; color: #fa5252; }
 
-        /* Modal nhập liệu */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
-        .modal-content { background: white; width: 95%; max-width: 550px; border-radius: 15px; overflow: hidden; animation: slideIn 0.3s; }
-        @keyframes slideIn { from {transform: translateY(-20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
-        .modal-body { padding: 30px; }
+        /* Bộ lọc Trạng thái */
+        .filter-dropdown { position: relative; display: inline-block; }
+        .filter-content {
+            display: none; position: absolute; background: white; color: #333;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15); padding: 15px; border-radius: 8px;
+            z-index: 1200; top: 100%; right: 0; min-width: 150px;
+        }
+        .filter-content.show { display: block; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 95%; max-width: 600px; border-radius: 15px; padding: 25px; max-height: 90vh; overflow-y: auto; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #444; }
-        .form-group input { width: 100%; padding: 11px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-size: 22px; font-weight: 700;">🛡️ QUẢN LÝ BẢO HIỂM</div>
+    <div style="font-size: 22px; font-weight: 700;">🛡️ QUẢN LÝ BẢO HIỂM Ô TÔ</div>
     <div style="display: flex; gap: 10px;">
         <button class="btn btn-add" onclick="openModal()">+ Thêm Bảo Hiểm Mới</button>
         <button class="btn" style="background:#dc3545;">Đăng xuất</button>
@@ -78,9 +102,14 @@
 </header>
 
 <div class="container">
+    <div id="alertBox">
+        <span id="alertText"></span>
+        <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">×</button>
+    </div>
+
     <div class="sticky-tools">
         <div class="controls">
-            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Tìm theo tên khách hàng, biển số hoặc địa chỉ..." onkeyup="filterTable()">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Tìm theo tên khách hàng, biển số, địa chỉ..." onkeyup="filterData()">
             <button class="btn btn-refresh" onclick="loadData()">🔄 Tải lại dữ liệu</button>
         </div>
     </div>
@@ -89,17 +118,26 @@
         <table>
             <thead>
                 <tr>
-                    <th>STT</th>
-                    <th>Khách hàng</th>
-                    <th>Địa chỉ</th>
-                    <th>Số điện thoại</th>
-                    <th>Ngày cấp</th>
-                    <th style="cursor:pointer" onclick="toggleSort()">Ngày hết hạn <span id="sortDir">↓</span></th>
-                    <th>Hãng BH</th>
-                    <th>Loại xe</th>
-                    <th>Biển số</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
+                    <th class="col-stt">STT</th>
+                    <th class="col-name">Khách hàng</th>
+                    <th class="col-address">Địa chỉ</th>
+                    <th class="col-phone">Số điện thoại</th>
+                    <th class="col-date">Ngày cấp</th>
+                    <th class="col-date" style="cursor:pointer" onclick="toggleSort()">Hết hạn <span id="sortDir">↓</span></th>
+                    <th class="col-brand">Hãng BH</th>
+                    <th class="col-type">Loại xe</th>
+                    <th class="col-plate">Biển số</th>
+                    <th class="col-status">
+                        Trạng thái 
+                        <span style="cursor:pointer" onclick="document.getElementById('filterMenu').classList.toggle('show'); event.stopPropagation();">▼</span>
+                        <div id="filterMenu" class="filter-content">
+                            <label><input type="checkbox" class="st-chk" value="CON_HAN" checked> Còn hạn</label><br>
+                            <label><input type="checkbox" class="st-chk" value="SAP_HET" checked> Sắp hết</label><br>
+                            <label><input type="checkbox" class="st-chk" value="HET_HAN" checked> Hết hạn</label><br>
+                            <button class="btn" style="background:#007bff; width:100%; margin-top:10px; padding:5px;" onclick="filterData()">Lọc</button>
+                        </div>
+                    </th>
+                    <th class="col-action">Thao tác</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -109,25 +147,24 @@
 
 <div id="dataModal" class="modal">
     <div class="modal-content">
-        <div class="modal-body">
-            <h3 id="modalTitle" style="margin-top:0; color:#007bff">Thêm bảo hiểm mới</h3>
-            <input type="hidden" id="f_id">
-            <div class="form-group"><label>Tên khách hàng</label><input type="text" id="f_tenkhach"></div>
-            <div class="form-group"><label>Địa chỉ</label><input type="text" id="f_diachi"></div>
-            <div class="form-group"><label>Số điện thoại</label><input type="text" id="f_sdt"></div>
-            <div style="display:flex; gap:15px">
-                <div class="form-group" style="flex:1"><label>Ngày cấp</label><input type="date" id="f_ngaycap"></div>
-                <div class="form-group" style="flex:1"><label>Ngày hết hạn</label><input type="date" id="f_ngayhethan"></div>
-            </div>
-            <div style="display:flex; gap:15px">
-                <div class="form-group" style="flex:1"><label>Hãng bảo hiểm</label><input type="text" id="f_hangbh"></div>
-                <div class="form-group" style="flex:1"><label>Loại xe</label><input type="text" id="f_loaixe"></div>
-            </div>
-            <div class="form-group"><label>Biển số xe</label><input type="text" id="f_bienso" style="text-transform:uppercase"></div>
-            <div style="text-align:right; margin-top:25px">
-                <button class="btn" style="background:#6c757d; margin-right:8px" onclick="closeModal()">Đóng</button>
-                <button class="btn" style="background:#28a745" onclick="saveToNeon()">Lưu vào Neon</button>
-            </div>
+        <h3 id="modalTitle">Thông tin bảo hiểm</h3>
+        <input type="hidden" id="f_id">
+        <div class="form-group"><label>Tên khách hàng</label><input type="text" id="f_tenkhach"></div>
+        <div class="form-group"><label>Địa chỉ</label><input type="text" id="f_diachi"></div>
+        <div class="form-group"><label>Số điện thoại</label><input type="text" id="f_sdt"></div>
+        <div style="display:flex; gap:10px">
+            <div class="form-group" style="flex:1"><label>Ngày cấp</label><input type="date" id="f_ngaycap"></div>
+            <div class="form-group" style="flex:1"><label>Ngày hết hạn</label><input type="date" id="f_ngayhethan"></div>
+        </div>
+        <div style="display:flex; gap:10px">
+            <div class="form-group" style="flex:1"><label>Hãng bảo hiểm</label><input type="text" id="f_hangbh"></div>
+            <div class="form-group" style="flex:1"><label>Loại xe</label><input type="text" id="f_loaixe"></div>
+        </div>
+        <div class="form-group"><label>Biển số xe</label><input type="text" id="f_bienso" style="text-transform:uppercase"></div>
+        
+        <div style="text-align:right; margin-top:20px">
+            <button class="btn" style="background:#6c757d" onclick="closeModal()">Hủy</button>
+            <button class="btn" style="background:#28a745" onclick="saveData()">Lưu vào Neon</button>
         </div>
     </div>
 </div>
@@ -138,58 +175,78 @@
     let isSortDesc = true;
 
     async function loadData() {
-        const res = await fetch(API_URL);
-        listData = await res.json();
-        renderAll();
+        try {
+            const res = await fetch(API_URL);
+            listData = await res.json();
+            checkUpcomingExpirations();
+            renderTable(listData);
+        } catch (e) { alert("Lỗi tải dữ liệu!"); }
     }
 
-    function renderAll() {
-        listData.sort((a, b) => {
+    function checkUpcomingExpirations() {
+        const upcoming = listData.filter(item => {
+            const diff = Math.ceil((new Date(item.ngayhethan) - new Date()) / 86400000);
+            return diff > 0 && diff <= 30;
+        });
+        const alertBox = document.getElementById('alertBox');
+        if (upcoming.length > 0) {
+            alertBox.style.display = 'flex';
+            document.getElementById('alertText').innerText = `📢 Có ${upcoming.length} bảo hiểm sắp hết hạn (trong 30 ngày tới)!`;
+        } else {
+            alertBox.style.display = 'none';
+        }
+    }
+
+    function renderTable(data) {
+        data.sort((a, b) => {
             const dA = new Date(a.ngayhethan), dB = new Date(b.ngayhethan);
             return isSortDesc ? dB - dA : dA - dB;
         });
-        filterTable();
-    }
 
-    function filterTable() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
-        
-        listData.filter(item => 
-            (item.tenkhach||"").toLowerCase().includes(query) || 
-            (item.bienso||"").toLowerCase().includes(query) || 
-            (item.diachi||"").toLowerCase().includes(query)
-        ).forEach((item, idx) => {
-            const st = getStatusInfo(item.ngayhethan);
+        data.forEach((item, idx) => {
+            const st = getStatus(item.ngayhethan);
             tbody.innerHTML += `
                 <tr>
-                    <td>${idx + 1}</td>
-                    <td><b>${item.tenkhach || ''}</b></td>
-                    <td>${item.diachi || '-'}</td>
-                    <td>${item.sdt || ''}</td>
-                    <td>${item.ngaycap ? new Date(item.ngaycap).toLocaleDateString('vi-VN') : ''}</td>
-                    <td><b>${new Date(item.ngayhethan).toLocaleDateString('vi-VN')}</b></td>
-                    <td>${item.hangbh || ''}</td>
-                    <td>${item.loaixe || ''}</td>
-                    <td style="text-transform:uppercase">${item.bienso || ''}</td>
-                    <td><span class="badge ${st.class}">${st.text}</span></td>
-                    <td>
-                        <button onclick="openModal(${item.id})" style="background:#ffc107; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold; margin-right:5px;">Sửa</button>
-                        <button onclick="deleteData(${item.id})" style="background:#dc3545; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Xóa</button>
+                    <td class="col-stt">${idx + 1}</td>
+                    <td class="col-name">${item.tenkhach || ''}</td>
+                    <td class="col-address">${item.diachi || ''}</td>
+                    <td class="col-phone">${item.sdt || ''}</td>
+                    <td class="col-date">${item.ngaycap ? new Date(item.ngaycap).toLocaleDateString('vi-VN') : ''}</td>
+                    <td class="col-date"><b>${new Date(item.ngayhethan).toLocaleDateString('vi-VN')}</b></td>
+                    <td class="col-brand">${item.hangbh || ''}</td>
+                    <td class="col-type">${item.loaixe || ''}</td>
+                    <td class="col-plate">${item.bienso || ''}</td>
+                    <td class="col-status"><span class="badge ${st.class}">${st.text}</span></td>
+                    <td class="col-action">
+                        <button onclick="openModal(${item.id})" style="color:#f0ad4e; background:none; border:none; cursor:pointer; font-weight:bold">Sửa</button> | 
+                        <button onclick="deleteData(${item.id})" style="color:#d9534f; background:none; border:none; cursor:pointer; font-weight:bold">Xóa</button>
                     </td>
                 </tr>`;
         });
     }
 
-    function getStatusInfo(dateStr) {
+    function getStatus(dateStr) {
         const diff = Math.ceil((new Date(dateStr) - new Date().setHours(0,0,0,0)) / 86400000);
-        if (diff < 0) return { text: "HẾT HẠN", class: "st-hethan" };
-        if (diff <= 30) return { text: `SẮP HẾT (${diff}n)`, class: "st-saphet" };
-        return { text: `CÒN HẠN (${diff}n)`, class: "st-conhan" };
+        if (diff < 0) return { text: "HẾT HẠN", class: "st-hethan", key: "HET_HAN" };
+        if (diff <= 30) return { text: `SẮP HẾT (${diff}n)`, class: "st-saphet", key: "SAP_HET" };
+        return { text: "CÒN HẠN", class: "st-conhan", key: "CON_HAN" };
     }
 
-    async function saveToNeon() {
+    function filterData() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const activeSt = Array.from(document.querySelectorAll('.st-chk:checked')).map(c => c.value);
+        
+        const filtered = listData.filter(item => {
+            const stKey = getStatus(item.ngayhethan).key;
+            const matchSearch = (item.tenkhach||'').toLowerCase().includes(query) || (item.bienso||'').toLowerCase().includes(query);
+            return matchSearch && activeSt.includes(stKey);
+        });
+        renderTable(filtered);
+    }
+
+    async function saveData() {
         const id = document.getElementById('f_id').value;
         const payload = {
             tenkhach: document.getElementById('f_tenkhach').value,
@@ -205,46 +262,39 @@
         const method = id ? 'PUT' : 'POST';
         const url = id ? `${API_URL}/${id}` : API_URL;
 
-        const response = await fetch(url, {
-            method: method,
+        const res = await fetch(url, {
+            method,
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
 
-        if(response.ok) { 
-            closeModal(); 
-            loadData(); 
-            alert("Lưu thành công vào Database Neon!");
-        } else {
-            alert("Lỗi server: Không thể lưu dữ liệu.");
-        }
+        if(res.ok) { closeModal(); loadData(); }
     }
 
     function openModal(id = null) {
         if(id) {
             const item = listData.find(x => x.id === id);
             document.getElementById('f_id').value = item.id;
-            document.getElementById('f_tenkhach').value = item.tenkhach || "";
-            document.getElementById('f_diachi').value = item.diachi || "";
-            document.getElementById('f_sdt').value = item.sdt || "";
+            document.getElementById('f_tenkhach').value = item.tenkhach;
+            document.getElementById('f_diachi').value = item.diachi;
+            document.getElementById('f_sdt').value = item.sdt;
             document.getElementById('f_ngaycap').value = item.ngaycap ? item.ngaycap.split('T')[0] : '';
             document.getElementById('f_ngayhethan').value = item.ngayhethan ? item.ngayhethan.split('T')[0] : '';
-            document.getElementById('f_hangbh').value = item.hangbh || "";
-            document.getElementById('f_loaixe').value = item.loaixe || "";
-            document.getElementById('f_bienso').value = item.bienso || "";
-            document.getElementById('modalTitle').innerText = "Chỉnh sửa bảo hiểm";
+            document.getElementById('f_hangbh').value = item.hangbh;
+            document.getElementById('f_loaixe').value = item.loaixe;
+            document.getElementById('f_bienso').value = item.bienso;
         } else {
             document.getElementById('f_id').value = "";
-            document.querySelectorAll('.modal-body input').forEach(i => i.value = "");
-            document.getElementById('modalTitle').innerText = "Thêm bảo hiểm mới";
+            document.querySelectorAll('.modal-content input').forEach(i => i.value = "");
         }
         document.getElementById('dataModal').style.display = 'flex';
     }
 
     function closeModal() { document.getElementById('dataModal').style.display = 'none'; }
-    function toggleSort() { isSortDesc = !isSortDesc; document.getElementById('sortDir').innerText = isSortDesc ? '↓' : '↑'; renderAll(); }
-    async function deleteData(id) { if(confirm("Xóa vĩnh viễn khỏi Database?")) { await fetch(`${API_URL}/${id}`, {method:'DELETE'}); loadData(); } }
+    function toggleSort() { isSortDesc = !isSortDesc; document.getElementById('sortDir').innerText = isSortDesc ? '↓' : '↑'; renderTable(listData); }
+    async function deleteData(id) { if(confirm("Xóa dòng này?")) { await fetch(`${API_URL}/${id}`, {method:'DELETE'}); loadData(); } }
     
+    window.onclick = () => document.getElementById('filterMenu').classList.remove('show');
     window.onload = loadData;
 </script>
 </body>
