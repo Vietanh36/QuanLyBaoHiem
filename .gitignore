@@ -41,3 +41,11 @@ Desktop.ini
 .DS_Store
 .AppleDouble
 .LSOverride
+ 
+ # Backend
+backend/node_modules/
+backend/.env
+
+# Mac & Windows
+.DS_Store
+Thumbs.db

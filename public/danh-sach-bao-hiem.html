@@ -51,7 +51,6 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -79,7 +78,6 @@
             padding: 12px 20px;
             border-radius: 50px;
             border: 2px solid #ddd;
-            margin-bottom: 20px;
             font-size: 16px;
         }
         table {
@@ -95,23 +93,18 @@
         th {
             background: #007bff;
             color: white;
-            position: relative;
         }
-
         .status {
             padding: 8px 16px;
             border-radius: 30px;
             font-size: 14px;
             font-weight: 600;
             display: inline-block;
-            text-align: center;
             min-width: 145px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        .con-han { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .sap-het { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; animation: pulse 2s infinite; }
-        .het-han { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
+        .con-han { background: #d4edda; color: #155724; }
+        .sap-het { background: #fff3cd; color: #856404; animation: pulse 2s infinite; }
+        .het-han { background: #f8d7da; color: #721c24; }
         tr.sap-het-han { background: #fff3cd !important; }
 
         .action-btn {
@@ -120,19 +113,9 @@
             border-radius: 6px;
             cursor: pointer;
             margin-right: 6px;
-            font-size: 14px;
         }
         .edit-btn { background: #ffc107; color: #212529; }
         .delete-btn { background: #dc3545; color: white; }
-
-        .filter-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            margin-left: 8px;
-        }
 
         .note-cell {
             cursor: pointer;
@@ -141,15 +124,6 @@
             white-space: pre-wrap;
         }
         .note-cell:hover { background-color: #f8f9fa; }
-        .note-input {
-            width: 100%;
-            height: 80px;
-            padding: 8px;
-            border: 2px solid #007bff;
-            border-radius: 6px;
-            font-size: 14px;
-            resize: vertical;
-        }
 
         .modal {
             display: none;
@@ -171,30 +145,6 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        .modal h2 { margin-top: 0; color: #007bff; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-        }
-        .form-group textarea { height: 80px; resize: vertical; }
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-        .btn-cancel { background: #6c757d; color: white; }
-        .btn-save { background: #28a745; color: white; }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.85; }
-        }
     </style>
 </head>
 <body>
@@ -203,7 +153,7 @@
             <div class="logo">🚗 Danh Sách Bảo Hiểm Ô Tô</div>
             <div class="nav-buttons">
                 <button onclick="switchToHome()" class="nav-btn btn-home">🏠 Trang Chủ</button>
-                <button onclick="switchToAdd()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
+                <button onclick="showAddModal()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
                 <button onclick="showRegisterModal()" class="nav-btn btn-register" id="btnRegister">Đăng ký tài khoản</button>
                 <button onclick="logout()" class="nav-btn btn-logout">Đăng xuất</button>
             </div>
@@ -212,7 +162,7 @@
         <div class="main">
             <div id="notificationBar" class="notification-bar">
                 🚨 CÓ <span id="countExpiring" style="font-size:22px; font-weight:bold"></span>
-                BẢO HIỂM SẮP HẾT HẠN (còn dưới 30 ngày)
+                BẢO HIỂM SẮP HẾT HẠN (dưới 30 ngày)
                 <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
             </div>
 
@@ -221,18 +171,14 @@
                        placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng bảo hiểm, note..."
                        onkeyup="searchTable()">
                 
-                <button onclick="refreshTable()" 
-                        style="padding: 10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer;">
-                    🔄 Cập nhật trạng thái
-                </button>
                 <button onclick="loadData()" 
-                        style="padding: 10px 22px; background:#6c757d; color:white; border:none; border-radius:8px; cursor:pointer;">
-                    🔁 Tải lại dữ liệu
+                        style="padding: 10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer;">
+                    🔄 Tải lại từ Server
                 </button>
             </div>
 
             <div style="overflow-x:auto;">
-                <table id="insuranceTable">
+                <table>
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -244,7 +190,7 @@
                             <th>Loại xe</th>
                             <th>Biển số</th>
                             <th>Note (Click để sửa)</th>
-                            <th>Trạng thái <button class="filter-btn" onclick="toggleFilter()">▼</button></th>
+                            <th>Trạng thái</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
@@ -260,268 +206,249 @@
         </div>
     </div>
 
-    <!-- Popup Sửa Thông Tin -->
+    <!-- Modal Sửa / Thêm -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
+            <h2 id="modalTitle">✏️ Sửa Thông Tin Bảo Hiểm</h2>
             <input type="hidden" id="editId">
-            <div class="form-group">
-                <label>Tên khách hàng</label>
-                <input type="text" id="editTenKhach">
-            </div>
-            <div class="form-group">
-                <label>Số điện thoại</label>
-                <input type="text" id="editSdt">
-            </div>
-            <div class="form-group">
-                <label>Ngày cấp</label>
-                <input type="date" id="editNgayCap">
-            </div>
-            <div class="form-group">
-                <label>Ngày hết hạn</label>
-                <input type="date" id="editNgayHetHan">
-            </div>
-            <div class="form-group">
-                <label>Hãng bảo hiểm</label>
-                <input type="text" id="editHangBH">
-            </div>
-            <div class="form-group">
-                <label>Loại xe</label>
-                <input type="text" id="editLoaiXe">
-            </div>
-            <div class="form-group">
-                <label>Biển số xe</label>
-                <input type="text" id="editBienSo" style="text-transform:uppercase;">
-            </div>
-            <div class="form-group">
-                <label>Ghi chú (Note)</label>
-                <textarea id="editNote"></textarea>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-                <button class="btn-save" onclick="saveEdit()">Lưu thay đổi</button>
+            <div class="form-group"><label>Tên khách hàng</label><input type="text" id="editTenKhach"></div>
+            <div class="form-group"><label>Số điện thoại</label><input type="text" id="editSdt"></div>
+            <div class="form-group"><label>Địa chỉ</label><input type="text" id="editDiachi"></div>
+            <div class="form-group"><label>Ngày cấp</label><input type="date" id="editNgayCap"></div>
+            <div class="form-group"><label>Ngày hết hạn</label><input type="date" id="editNgayHetHan"></div>
+            <div class="form-group"><label>Hãng bảo hiểm</label><input type="text" id="editHangBH"></div>
+            <div class="form-group"><label>Loại xe</label><input type="text" id="editLoaiXe"></div>
+            <div class="form-group"><label>Biển số xe</label><input type="text" id="editBienSo" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Ghi chú</label><textarea id="editNote"></textarea></div>
+
+            <div style="text-align:right; margin-top:20px;">
+                <button onclick="closeModal()" style="padding:10px 20px; background:#6c757d; color:white; border:none;">Hủy</button>
+                <button onclick="saveBaoHiem()" style="padding:10px 20px; background:#28a745; color:white; border:none;">Lưu thay đổi</button>
             </div>
         </div>
     </div>
 
-    <!-- Popup Đăng ký tài khoản -->
+    <!-- Modal Đăng ký (giữ nguyên) -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <h2>📝 Đăng ký tài khoản mới</h2>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="regEmail" placeholder="example@email.com">
-            </div>
-            <div class="form-group">
-                <label>Mật khẩu</label>
-                <input type="password" id="regPassword" placeholder="Mật khẩu">
-            </div>
-            <div class="form-group">
-                <label>Vai trò</label>
+            <div class="form-group"><label>Email</label><input type="email" id="regEmail"></div>
+            <div class="form-group"><label>Mật khẩu</label><input type="password" id="regPassword"></div>
+            <div class="form-group"><label>Vai trò</label>
                 <select id="regRole">
                     <option value="user">Nhân viên</option>
                     <option value="admin">Quản trị viên</option>
                 </select>
             </div>
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeRegisterModal()">Hủy</button>
-                <button class="btn-save" onclick="registerAccount()">Đăng ký</button>
+            <div style="text-align:right;">
+                <button onclick="closeRegisterModal()" style="padding:10px 20px; background:#6c757d; color:white; border:none;">Hủy</button>
+                <button onclick="registerAccount()" style="padding:10px 20px; background:#28a745; color:white; border:none;">Đăng ký</button>
             </div>
         </div>
     </div>
 
     <script>
+        const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
         let danhSachBaoHiem = [];
-        let trangThaiFilter = "ALL";
-        let sapXepTheoNgay = null;
+        let currentRole = localStorage.getItem('role') || 'user';
 
-        // ==================== KIỂM TRA ĐĂNG NHẬP ====================
-        function checkLogin() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            
-            if (!isLoggedIn) {
-                alert("⛔ Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
-                window.location.href = "login.html";
-                return false;
-            }
-            return true;
+        // Kiểm tra đăng nhập
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            alert("⛔ Bạn chưa đăng nhập!");
+            window.location.href = "login.html";
         }
 
-        const currentRole = localStorage.getItem('role') || 'user';
-        const currentUsername = localStorage.getItem('username') || "Người dùng";
-
-        // Ẩn nút Đăng ký nếu không phải Admin
         if (currentRole !== 'admin') {
             const regBtn = document.getElementById('btnRegister');
             if (regBtn) regBtn.style.display = 'none';
         }
 
+        async function loadData() {
+    try {
+        console.log("🔄 Đang gọi API từ:", API_URL);
+
+        const res = await fetch(API_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log("📡 Response status:", res.status, res.statusText);
+
+        if (!res.ok) {
+            throw new Error(`Lỗi server: ${res.status} ${res.statusText}`);
+        }
+
+        danhSachBaoHiem = await res.json();
+        
+        console.log("✅ Nhận được dữ liệu từ backend:", danhSachBaoHiem.length, "bản ghi");
+        console.table(danhSachBaoHiem.slice(0, 5));   // hiển thị 5 dòng đầu
+
+        renderTable();
+        checkThongBaoDo();
+        
+        alert(`✅ Tải thành công ${danhSachBaoHiem.length} bản ghi từ Neon!`);
+        
+    } catch (err) {
+        console.error("❌ LỖI KẾT NỐI:", err);
+        alert("❌ Không tải được dữ liệu từ Backend!\n\nLỗi: " + err.message + "\n\nHãy mở F12 → Console và chụp ảnh lỗi gửi mình.");
+    }
+}
+
         function getTrangThai(ngayHetHan) {
+            if (!ngayHetHan) return { text: "Không xác định", class: "" };
             const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            today.setHours(0,0,0,0);
             const hetHan = new Date(ngayHetHan);
-            hetHan.setHours(0, 0, 0, 0);
-            const diffDays = Math.ceil((hetHan - today) / (1000 * 60 * 60 * 24));
+            const diffDays = Math.ceil((hetHan - today) / (1000*60*60*24));
 
             if (diffDays < 0) return { text: "HẾT HẠN", class: "het-han" };
             if (diffDays <= 30) return { text: `SẮP HẾT (${diffDays} ngày)`, class: "sap-het" };
             return { text: `CÒN HẠN (${diffDays} ngày)`, class: "con-han" };
         }
 
-        function loadData() {
-            danhSachBaoHiem = JSON.parse(localStorage.getItem('danhSachBaoHiem')) || [];
-            renderTable();
-        }
-
-        function renderTable(filteredList = null) {
+        function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
-            let listToRender = filteredList || danhSachBaoHiem;
-
-            if (trangThaiFilter !== "ALL") {
-                listToRender = listToRender.filter(item => {
-                    const st = getTrangThai(item.ngayHetHan);
-                    return (trangThaiFilter === "HET_HAN" && st.class === "het-han") ||
-                           (trangThaiFilter === "SAP_HET" && st.class === "sap-het") ||
-                           (trangThaiFilter === "CON_HAN" && st.class === "con-han");
-                });
-            }
-
-            if (sapXepTheoNgay) {
-                const today = new Date();
-                listToRender.sort((a, b) => {
-                    const diffA = Math.ceil((new Date(a.ngayHetHan) - today) / (1000*60*60*24));
-                    const diffB = Math.ceil((new Date(b.ngayHetHan) - today) / (1000*60*60*24));
-                    return sapXepTheoNgay === 'desc' ? diffB - diffA : diffA - diffB;
-                });
-            }
-
-            listToRender.forEach((item, index) => {
-                const status = getTrangThai(item.ngayHetHan);
-                const rowClass = status.class === "sap-het" ? "sap-het-han" : "";
-
+            danhSachBaoHiem.forEach((item, index) => {
+                const status = getTrangThai(item.ngayhethan);
                 const row = document.createElement('tr');
-                row.className = rowClass;
+                row.className = status.class === "sap-het" ? "sap-het-han" : "";
                 row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td><strong>${item.tenKhach || ''}</strong></td>
+                    <td><strong>${item.tenkhach || ''}</strong></td>
                     <td>${item.sdt || ''}</td>
-                    <td>${formatDate(item.ngayCap)}</td>
-                    <td><strong>${formatDate(item.ngayHetHan)}</strong></td>
-                    <td>${item.hangBH || ''}</td>
-                    <td>${item.loaiXe || ''}</td>
-                    <td style="text-transform:uppercase; font-weight:500;">${item.bienSo || ''}</td>
+                    <td>${item.ngaycap || ''}</td>
+                    <td><strong>${item.ngayhethan || ''}</strong></td>
+                    <td>${item.hangbh || ''}</td>
+                    <td>${item.loaixe || ''}</td>
+                    <td style="text-transform:uppercase;">${item.bienso || ''}</td>
                     <td class="note-cell" onclick="editNoteInline(this, ${item.id})">${item.note || '<i style="color:#aaa;">(Chưa có ghi chú)</i>'}</td>
                     <td><span class="status ${status.class}">${status.text}</span></td>
                     <td>
                         <button onclick="editBaoHiem(${item.id})" class="action-btn edit-btn">✏️ Sửa</button>
-                        <button onclick="xoaBaoHiem(${item.id})" class="action-btn delete-btn">🗑️ Xóa</button>
+                        <button onclick="deleteBaoHiem(${item.id})" class="action-btn delete-btn">🗑️ Xóa</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
-
-            checkThongBaoDo();
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            return new Date(dateStr).toLocaleDateString('vi-VN', {
-                day: '2-digit', month: '2-digit', year: 'numeric'
-            });
         }
 
         function editNoteInline(cell, id) {
-            const currentNote = cell.textContent.trim() === '(Chưa có ghi chú)' ? '' : cell.textContent.trim();
+            const current = cell.textContent.trim() === '(Chưa có ghi chú)' ? '' : cell.textContent.trim();
             const input = document.createElement('textarea');
             input.className = 'note-input';
-            input.value = currentNote;
+            input.value = current;
             cell.innerHTML = '';
             cell.appendChild(input);
             input.focus();
 
-            function saveNote() {
-                const newNote = input.value.trim();
-                const item = danhSachBaoHiem.find(x => x.id === id);
-                if (item) item.note = newNote;
-                localStorage.setItem('danhSachBaoHiem', JSON.stringify(danhSachBaoHiem));
-                renderTable();
-            }
+            const save = async () => {
+                try {
+                    await fetch(`${API_URL}/${id}`, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ note: input.value.trim() })
+                    });
+                    loadData();
+                } catch(e) { alert("Lỗi cập nhật note"); }
+            };
+            input.onblur = save;
+            input.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } };
+        }
 
-            input.addEventListener('blur', saveNote);
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    saveNote();
-                }
-            });
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = "Thêm Bảo Hiểm Mới";
+            document.getElementById('editId').value = '';
+            clearModalFields();
+            document.getElementById('editModal').style.display = 'flex';
         }
 
         function editBaoHiem(id) {
-            if (currentRole !== 'admin') {
-                alert("⛔ Bạn không có quyền sửa dữ liệu!");
-                return;
-            }
             const item = danhSachBaoHiem.find(x => x.id === id);
             if (!item) return;
 
+            document.getElementById('modalTitle').textContent = "Sửa Thông Tin Bảo Hiểm";
             document.getElementById('editId').value = item.id;
-            document.getElementById('editTenKhach').value = item.tenKhach || '';
+            document.getElementById('editTenKhach').value = item.tenkhach || '';
             document.getElementById('editSdt').value = item.sdt || '';
-            document.getElementById('editNgayCap').value = item.ngayCap || '';
-            document.getElementById('editNgayHetHan').value = item.ngayHetHan || '';
-            document.getElementById('editHangBH').value = item.hangBH || '';
-            document.getElementById('editLoaiXe').value = item.loaiXe || '';
-            document.getElementById('editBienSo').value = item.bienSo || '';
+            document.getElementById('editDiachi').value = item.diachi || '';
+            document.getElementById('editNgayCap').value = item.ngaycap || '';
+            document.getElementById('editNgayHetHan').value = item.ngayhethan || '';
+            document.getElementById('editHangBH').value = item.hangbh || '';
+            document.getElementById('editLoaiXe').value = item.loaixe || '';
+            document.getElementById('editBienSo').value = item.bienso || '';
             document.getElementById('editNote').value = item.note || '';
-
             document.getElementById('editModal').style.display = 'flex';
+        }
+
+        async function saveBaoHiem() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                tenkhach: document.getElementById('editTenKhach').value.trim(),
+                sdt: document.getElementById('editSdt').value.trim(),
+                diachi: document.getElementById('editDiachi').value.trim(),
+                ngaycap: document.getElementById('editNgayCap').value,
+                ngayhethan: document.getElementById('editNgayHetHan').value,
+                hangbh: document.getElementById('editHangBH').value.trim(),
+                loaixe: document.getElementById('editLoaiXe').value.trim(),
+                bienso: document.getElementById('editBienSo').value.trim().toUpperCase(),
+                note: document.getElementById('editNote').value.trim()
+            };
+
+            try {
+                const url = id ? `${API_URL}/${id}` : API_URL;
+                const method = id ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    alert(id ? "✅ Cập nhật thành công!" : "✅ Thêm thành công!");
+                    closeModal();
+                    loadData();
+                } else {
+                    alert("❌ Có lỗi xảy ra");
+                }
+            } catch (err) {
+                alert("❌ Không kết nối được với server");
+            }
+        }
+
+        async function deleteBaoHiem(id) {
+            if (!confirm("Bạn có chắc muốn xóa?")) return;
+            try {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                loadData();
+            } catch (err) {
+                alert("Lỗi khi xóa");
+            }
+        }
+
+        function clearModalFields() {
+            document.getElementById('editTenKhach').value = '';
+            document.getElementById('editSdt').value = '';
+            document.getElementById('editDiachi').value = '';
+            document.getElementById('editNgayCap').value = '';
+            document.getElementById('editNgayHetHan').value = '';
+            document.getElementById('editHangBH').value = '';
+            document.getElementById('editLoaiXe').value = '';
+            document.getElementById('editBienSo').value = '';
+            document.getElementById('editNote').value = '';
         }
 
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
         }
 
-        function saveEdit() {
-            if (currentRole !== 'admin') {
-                alert("⛔ Bạn không có quyền sửa dữ liệu!");
-                return;
-            }
-            const id = parseInt(document.getElementById('editId').value);
-            const item = danhSachBaoHiem.find(x => x.id === id);
-            if (!item) return;
-
-            item.tenKhach = document.getElementById('editTenKhach').value.trim();
-            item.sdt = document.getElementById('editSdt').value.trim();
-            item.ngayCap = document.getElementById('editNgayCap').value;
-            item.ngayHetHan = document.getElementById('editNgayHetHan').value;
-            item.hangBH = document.getElementById('editHangBH').value.trim();
-            item.loaiXe = document.getElementById('editLoaiXe').value.trim();
-            item.bienSo = document.getElementById('editBienSo').value.trim().toUpperCase();
-            item.note = document.getElementById('editNote').value.trim();
-
-            localStorage.setItem('danhSachBaoHiem', JSON.stringify(danhSachBaoHiem));
-            closeModal();
-            renderTable();
-            alert("✅ Đã lưu thay đổi thành công!");
-        }
-
-        function xoaBaoHiem(id) {
-            if (currentRole !== 'admin') {
-                alert("⛔ Bạn không có quyền xóa dữ liệu!");
-                return;
-            }
-            if (confirm("Bạn có chắc chắn muốn xóa bảo hiểm này không?")) {
-                danhSachBaoHiem = danhSachBaoHiem.filter(item => item.id !== id);
-                localStorage.setItem('danhSachBaoHiem', JSON.stringify(danhSachBaoHiem));
-                renderTable();
-            }
-        }
-
         function showRegisterModal() {
             if (currentRole !== 'admin') {
-                alert("⛔ Chỉ Admin mới được đăng ký tài khoản!");
+                alert("Chỉ Admin mới được đăng ký tài khoản!");
                 return;
             }
             document.getElementById('registerModal').style.display = 'flex';
@@ -532,111 +459,26 @@
         }
 
         function registerAccount() {
-            const email = document.getElementById('regEmail').value.trim().toLowerCase();
-            const password = document.getElementById('regPassword').value.trim();
-            const role = document.getElementById('regRole').value;
-
-            if (!email || !password) {
-                alert("Vui lòng nhập đầy đủ email và mật khẩu!");
-                return;
-            }
-
-            let users = JSON.parse(localStorage.getItem('users')) || [];
-            if (users.some(u => u.email === email)) {
-                alert("Email này đã tồn tại!");
-                return;
-            }
-
-            users.push({
-                email: email,
-                password: password,
-                role: role,
-                username: email.split('@')[0]
-            });
-
-            localStorage.setItem('users', JSON.stringify(users));
-            alert(`✅ Đăng ký thành công!\nEmail: ${email}`);
+            alert("Chức năng đăng ký tài khoản chưa kết nối backend. Tạm thời bỏ qua.");
             closeRegisterModal();
         }
 
         function logout() {
-            if (confirm("Bạn có chắc muốn đăng xuất?")) {
-                // Chỉ xóa thông tin đăng nhập, GIỮ LẠI dữ liệu bảo hiểm
+            if (confirm("Đăng xuất?")) {
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('role');
-                localStorage.removeItem('username');
-                
                 window.location.href = "login.html";
             }
         }
 
         function switchToHome() {
-            window.open("index.html", "_self");
-        }
-
-        function switchToAdd() {
-            window.open("index.html", "_self");
-        }
-
-        function refreshTable() {
-            renderTable();
-            alert("✅ Trạng thái đã được cập nhật theo ngày hiện tại!");
-        }
-
-        function toggleFilter() {
-            let existingMenu = document.getElementById('filterMenu');
-            if (existingMenu) existingMenu.remove();
-
-            const menu = document.createElement('div');
-            menu.id = 'filterMenu';
-            menu.style.cssText = `position: absolute; background: white; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); padding: 8px 0; z-index: 1000; min-width: 240px; font-size: 15px;`;
-
-            const rect = this.getBoundingClientRect();
-            menu.style.top = (rect.bottom + window.scrollY + 8) + 'px';
-            menu.style.left = (rect.left + window.scrollX - 10) + 'px';
-
-            menu.innerHTML = `
-                <div style="padding: 10px 16px; font-weight: 600; color: #007bff;">Lọc theo trạng thái</div>
-                <div onclick="applyFilter('ALL')" style="padding:12px 20px; cursor:pointer;">📋 Tất cả</div>
-                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
-                <div onclick="applySort('desc')" style="padding:12px 20px; cursor:pointer;">🔽 Còn hạn: Nhiều ngày nhất</div>
-                <div onclick="applySort('asc')" style="padding:12px 20px; cursor:pointer;">🔼 Còn hạn: Ít ngày nhất</div>
-                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
-                <div onclick="applyFilter('CON_HAN')" style="padding:12px 20px; cursor:pointer;">🟢 Còn hạn</div>
-                <div onclick="applyFilter('SAP_HET')" style="padding:12px 20px; cursor:pointer;">🟡 Sắp hết hạn</div>
-                <div onclick="applyFilter('HET_HAN')" style="padding:12px 20px; cursor:pointer;">🔴 Hết hạn</div>
-            `;
-
-            document.body.appendChild(menu);
-
-            setTimeout(() => {
-                document.addEventListener('click', function closeMenu(e) {
-                    if (!menu.contains(e.target)) {
-                        menu.remove();
-                        document.removeEventListener('click', closeMenu);
-                    }
-                });
-            }, 10);
-        }
-
-        function applyFilter(filterType) {
-            trangThaiFilter = filterType;
-            sapXepTheoNgay = null;
-            if (document.getElementById('filterMenu')) document.getElementById('filterMenu').remove();
-            renderTable();
-        }
-
-        function applySort(sortType) {
-            sapXepTheoNgay = sortType;
-            trangThaiFilter = "CON_HAN";
-            if (document.getElementById('filterMenu')) document.getElementById('filterMenu').remove();
-            renderTable();
+            window.location.href = "index.html";
         }
 
         function checkThongBaoDo() {
             const today = new Date();
             let count = danhSachBaoHiem.filter(item => {
-                const diff = Math.ceil((new Date(item.ngayHetHan) - today) / (1000*60*60*24));
+                const diff = Math.ceil((new Date(item.ngayhethan) - today) / (86400000));
                 return diff > 0 && diff <= 30;
             }).length;
 
@@ -658,36 +500,29 @@
             if (!keyword) return renderTable();
 
             const filtered = danhSachBaoHiem.filter(item =>
-                (item.tenKhach || '').toLowerCase().includes(keyword) ||
+                (item.tenkhach || '').toLowerCase().includes(keyword) ||
                 (item.sdt || '').includes(keyword) ||
-                (item.bienSo || '').toLowerCase().includes(keyword) ||
-                (item.hangBH || '').toLowerCase().includes(keyword) ||
-                (item.note || '').toLowerCase().includes(keyword)
+                (item.bienso || '').toLowerCase().includes(keyword) ||
+                (item.hangbh || '').toLowerCase().includes(keyword)
             );
-            renderTable(filtered);
+            renderTable(filtered);   // tạm thời render filtered trực tiếp
         }
 
         function exportData() {
             let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
             danhSachBaoHiem.forEach((item, i) => {
-                const status = getTrangThai(item.ngayHetHan);
-                csv += `${i+1},"${item.tenKhach || ''}","${item.sdt || ''}",${item.ngayCap || ''},${item.ngayHetHan || ''},"${item.hangBH || ''}","${item.loaiXe || ''}","${item.bienSo || ''}","${item.note || ''}","${status.text}"\n`;
+                const status = getTrangThai(item.ngayhethan);
+                csv += `${i+1},"${item.tenkhach || ''}","${item.sdt || ''}",${item.ngaycap || ''},${item.ngayhethan || ''},"${item.hangbh || ''}","${item.loaixe || ''}","${item.bienso || ''}","${item.note || ''}","${status.text}"\n`;
             });
-
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.download = `BaoHiem_Oto_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
-            alert("✅ Đã xuất file Excel thành công!");
         }
 
-        // ==================== KHỞI ĐỘNG ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            if (checkLogin()) {
-                loadData();
-            }
-        });
+        // Khởi động
+        window.onload = loadData;
     </script>
 </body>
 </html>
