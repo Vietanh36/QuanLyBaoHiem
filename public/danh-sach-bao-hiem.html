@@ -3,110 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh Sách Bảo Hiểm Ô Tô</title>
+    <title>Danh Sách Bảo Hiểm Ô TÔ</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         
-        body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); margin:0; padding:20px; }
-        .container { max-width: 1400px; margin: auto; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
-        header { background: linear-gradient(90deg, #007bff, #0056b3); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .logo { font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .nav-btn { padding: 10px 22px; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: 500; cursor: pointer; }
+        body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:20px; }
+        .container { max-width: 1500px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        header { background: #007bff; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-buttons { display: flex; gap: 10px; }
+        .nav-btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; }
         .btn-home { background: #28a745; }
-        .btn-add { background: #007bff; }
+        .btn-add { background: #17a2b8; }
         .btn-logout { background: #dc3545; }
 
-        .notification-bar { background: #d32f2f; color: white; padding: 15px 25px; margin: 20px; border-radius: 8px; display: none; align-items: center; gap: 15px; font-weight: 600; }
-        .main { padding: 30px; }
-        .search-box { width: 100%; max-width: 450px; padding: 12px 20px; border-radius: 50px; border: 2px solid #ddd; font-size: 16px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
-        th { background: #007bff; color: white; }
-        .status { padding: 8px 16px; border-radius: 30px; font-size: 14px; font-weight: 600; display: inline-block; min-width: 145px; }
-        .con-han { background: #d4edda; color: #155724; }
-        .sap-het { background: #fff3cd; color: #856404; animation: pulse 2s infinite; }
-        .het-han { background: #f8d7da; color: #721c24; }
-        .action-btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; margin-right: 6px; }
-        .edit-btn { background: #ffc107; color: #212529; }
-        .delete-btn { background: #dc3545; color: white; }
-        .note-cell { cursor: pointer; min-width: 180px; max-width: 250px; white-space: pre-wrap; }
-        .note-cell:hover { background-color: #f8f9fa; }
+        .notification-bar { background: #d32f2f; color: white; padding: 12px 20px; margin: 15px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; }
+        
+        .main { padding: 20px; }
+        .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-box { flex: 1; padding: 10px 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 520px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        /* Table */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th { background: #007bff; color: white; padding: 12px; text-align: left; position: relative; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+
+        /* Excel Filter Style */
+        .filter-icon { cursor: pointer; margin-left: 5px; font-size: 12px; }
+        .filter-dropdown { 
+            display: none; position: absolute; top: 100%; left: 0; 
+            background: white; color: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 10px; border-radius: 8px; z-index: 100; min-width: 150px;
+            font-weight: normal;
+        }
+        .filter-dropdown.show { display: block; }
+        .filter-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+        .filter-footer { border-top: 1px solid #eee; margin-top: 8px; padding-top: 8px; display: flex; justify-content: space-between; }
+        .btn-filter { padding: 3px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; }
+
+        /* Status */
+        .status { padding: 5px 12px; border-radius: 15px; font-size: 13px; font-weight: bold; display: inline-block; min-width: 120px; text-align: center; }
+        .con-han { background: #d4edda; color: #155724; }
+        .sap-het { background: #fff3cd; color: #856404; }
+        .het-han { background: #f8d7da; color: #721c24; }
+
+        /* Action Buttons */
+        .action-btn { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 4px; font-size: 13px; }
+        .edit-btn { background: #ffc107; }
+        .delete-btn { background: #dc3545; color: white; }
+
+        /* MODAL FIX */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { 
+            background: white; width: 95%; max-width: 500px; border-radius: 12px; 
+            display: flex; flex-direction: column; max-height: 85vh; 
+        }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; font-weight: bold; font-size: 18px; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
-        .form-group textarea { height: 80px; resize: vertical; }
-        .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
-        .btn-cancel { background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        
         .btn-save { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
-
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+        .btn-cancel { background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">🚗 Danh Sách Bảo Hiểm Ô Tô</div>
-            <div class="nav-buttons">
-                <button onclick="switchToHome()" class="nav-btn btn-home">🏠 Trang Chủ</button>
-                <button onclick="switchToAdd()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
-                <button onclick="logout()" class="nav-btn btn-logout">Đăng xuất</button>
-            </div>
-        </header>
 
-        <div class="main">
-            <div id="notificationBar" class="notification-bar">
-                🚨 CÓ <span id="countExpiring" style="font-size:22px; font-weight:bold"></span>
-                BẢO HIỂM SẮP HẾT HẠN (dưới 30 ngày)
-                <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
-            </div>
+<div class="container">
+    <header>
+        <div style="font-size: 20px; font-weight: bold;">🚗 Danh Sách Bảo Hiểm Ô Tô</div>
+        <div class="nav-buttons">
+            <button class="nav-btn btn-home" onclick="location.reload()">🏠 Trang Chủ</button>
+            <button class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
+            <button class="nav-btn btn-logout">Đăng xuất</button>
+        </div>
+    </header>
 
-            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="searchInput" class="search-box" style="flex: 1;"
-                       placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng bảo hiểm, note..."
-                       onkeyup="searchTable()">
-                
-                <button onclick="loadData()" style="padding: 10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer;">
-                    🔄 Tải lại từ Server
-                </button>
-            </div>
-
-            <div style="overflow-x:auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Tên khách hàng</th>
-                            <th>SĐT</th>
-                            <th>Ngày cấp</th>
-                            <th>Ngày hết hạn</th>
-                            <th>Hãng BH</th>
-                            <th>Loại xe</th>
-                            <th>Biển số</th>
-                            <th>Note (Click để sửa)</th>
-                            <th>Trạng thái <button onclick="toggleFilter()" class="filter-btn" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">▼</button></th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
+    <div class="main">
+        <div id="notificationBar" class="notification-bar">
+            <span>🚨 CÓ <b id="countExpiring">0</b> BẢO HIỂM SẮP HẾT HẠN (dưới 30 ngày)</span>
+            <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
         </div>
 
-        <div style="text-align:center; padding:25px; background:#f8f9fa;">
-            <button onclick="exportData()" style="background:#007bff; color:white; padding:12px 30px; border:none; border-radius:8px; font-size:16px; cursor:pointer;">
-                📤 Xuất File Excel (CSV)
-            </button>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng..." onkeyup="filterTable()">
+            <button onclick="loadData()" style="padding: 10px 20px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer;">🔄 Tải lại</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên khách hàng</th>
+                        <th>SĐT</th>
+                        <th>Ngày cấp</th>
+                        <th>Ngày hết hạn</th>
+                        <th>Hãng BH</th>
+                        <th>Loại xe</th>
+                        <th>Biển số</th>
+                        <th>Note</th>
+                        <th>
+                            Trạng thái <span class="filter-icon" onclick="toggleFilter(event)">▼</span>
+                            <div id="filterMenu" class="filter-dropdown">
+                                <div class="filter-item"><input type="checkbox" value="CON_HAN" checked> Còn hạn</div>
+                                <div class="filter-item"><input type="checkbox" value="SAP_HET" checked> Sắp hết</div>
+                                <div class="filter-item"><input type="checkbox" value="HET_HAN" checked> Hết hạn</div>
+                                <div class="filter-footer">
+                                    <button class="btn-filter" onclick="resetFilter()">Tất cả</button>
+                                    <button class="btn-filter" style="background:#007bff; color:white;" onclick="filterTable()">Lọc</button>
+                                </div>
+                            </div>
+                        </th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Modal Sửa -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">✏️ Sửa Thông Tin Bảo Hiểm</div>
+        <div class="modal-body">
             <input type="hidden" id="editId">
             <div class="form-group"><label>Tên khách hàng</label><input type="text" id="editTenKhach"></div>
             <div class="form-group"><label>Số điện thoại</label><input type="text" id="editSdt"></div>
@@ -116,233 +141,145 @@
             <div class="form-group"><label>Loại xe</label><input type="text" id="editLoaiXe"></div>
             <div class="form-group"><label>Biển số xe</label><input type="text" id="editBienSo" style="text-transform:uppercase;"></div>
             <div class="form-group"><label>Ghi chú</label><textarea id="editNote" rows="3"></textarea></div>
-
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-                <button class="btn-save" onclick="saveBaoHiem()">Lưu thay đổi</button>
-            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-save" onclick="saveBaoHiem()">Lưu thông tin</button>
         </div>
     </div>
+</div>
 
-    <script>
-        const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
-        let danhSachBaoHiem = [];
-        let trangThaiFilter = "ALL";
+<script>
+    const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
+    let danhSachGoc = [];
 
-        async function loadData() {
-            try {
-                const res = await fetch(API_URL);
-                danhSachBaoHiem = await res.json();
-                renderTable();
-                checkThongBaoDo();
-            } catch (err) {
-                alert("❌ Không tải được dữ liệu từ server!");
-            }
-        }
+    async function loadData() {
+        try {
+            const res = await fetch(API_URL);
+            danhSachGoc = await res.json();
+            filterTable();
+            updateNotification();
+        } catch (e) { alert("Lỗi tải dữ liệu!"); }
+    }
 
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            return new Date(dateStr).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
+    function getTrangThai(dateStr) {
+        if (!dateStr) return { text: "N/A", class: "", key: "" };
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const exp = new Date(dateStr);
+        const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
 
-        function getTrangThai(ngayHetHan) {
-            if (!ngayHetHan) return { text: "Không xác định", class: "" };
-            const today = new Date();
-            const hetHan = new Date(ngayHetHan);
-            const diffDays = Math.ceil((hetHan - today) / (86400000));
+        if (diffDays < 0) return { text: "HẾT HẠN", class: "het-han", key: "HET_HAN" };
+        if (diffDays <= 30) return { text: `SẮP HẾT (${diffDays}n)`, class: "sap-het", key: "SAP_HET" };
+        return { text: `CÒN HẠN (${diffDays}n)`, class: "con-han", key: "CON_HAN" };
+    }
 
-            if (diffDays < 0) return { text: "HẾT HẠN", class: "het-han" };
-            if (diffDays <= 30) return { text: `SẮP HẾT (${diffDays} ngày)`, class: "sap-het" };
-            return { text: `CÒN HẠN (${diffDays} ngày)`, class: "con-han" };
-        }
+    function filterTable() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase();
+        const selectedKeys = Array.from(document.querySelectorAll('#filterMenu input:checked')).map(i => i.value);
+        
+        const filtered = danhSachGoc.filter(item => {
+            const status = getTrangThai(item.ngayhethan);
+            const matchSearch = (item.tenkhach || "").toLowerCase().includes(keyword) || 
+                                (item.bienso || "").toLowerCase().includes(keyword);
+            const matchFilter = selectedKeys.includes(status.key);
+            return matchSearch && matchFilter;
+        });
 
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
+        renderTable(filtered);
+        document.getElementById('filterMenu').classList.remove('show');
+    }
 
-            let list = danhSachBaoHiem;
-            if (trangThaiFilter !== "ALL") {
-                list = list.filter(item => {
-                    const st = getTrangThai(item.ngayhethan);
-                    return (trangThaiFilter === "HET_HAN" && st.class === "het-han") ||
-                           (trangThaiFilter === "SAP_HET" && st.class === "sap-het") ||
-                           (trangThaiFilter === "CON_HAN" && st.class === "con-han");
-                });
-            }
-
-            list.forEach((item, index) => {
-                const status = getTrangThai(item.ngayhethan);
-                const row = document.createElement('tr');
-                row.innerHTML = `
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        data.forEach((item, index) => {
+            const st = getTrangThai(item.ngayhethan);
+            tbody.innerHTML += `
+                <tr>
                     <td>${index + 1}</td>
-                    <td><strong>${item.tenkhach || ''}</strong></td>
+                    <td><b>${item.tenkhach || ''}</b></td>
                     <td>${item.sdt || ''}</td>
-                    <td>${formatDate(item.ngaycap)}</td>
-                    <td><strong>${formatDate(item.ngayhethan)}</strong></td>
+                    <td>${item.ngaycap ? new Date(item.ngaycap).toLocaleDateString('vi-VN') : ''}</td>
+                    <td><b>${item.ngayhethan ? new Date(item.ngayhethan).toLocaleDateString('vi-VN') : ''}</b></td>
                     <td>${item.hangbh || ''}</td>
                     <td>${item.loaixe || ''}</td>
                     <td style="text-transform:uppercase;">${item.bienso || ''}</td>
-                    <td class="note-cell" onclick="editNoteInline(this, ${item.id})">${item.note || '<i style="color:#aaa;">(Chưa có ghi chú)</i>'}</td>
-                    <td><span class="status ${status.class}">${status.text}</span></td>
+                    <td style="color:#888; font-size:12px;">${item.note || ''}</td>
+                    <td><span class="status ${st.class}">${st.text}</span></td>
                     <td>
-                        <button onclick="editBaoHiem(${item.id})" class="action-btn edit-btn">✏️ Sửa</button>
-                        <button onclick="deleteBaoHiem(${item.id})" class="action-btn delete-btn">🗑️ Xóa</button>
+                        <button class="action-btn edit-btn" onclick="editBaoHiem(${item.id})">Sửa</button>
+                        <button class="action-btn delete-btn" onclick="deleteBaoHiem(${item.id})">Xóa</button>
                     </td>
-                `;
-                tbody.appendChild(row);
-            });
+                </tr>
+            `;
+        });
+    }
+
+    function toggleFilter(e) {
+        e.stopPropagation();
+        document.getElementById('filterMenu').classList.toggle('show');
+    }
+
+    function resetFilter() {
+        document.querySelectorAll('#filterMenu input').forEach(i => i.checked = true);
+        filterTable();
+    }
+
+    function editBaoHiem(id) {
+        const item = danhSachGoc.find(x => x.id === id);
+        if(!item) return;
+        document.getElementById('editId').value = item.id;
+        document.getElementById('editTenKhach').value = item.tenkhach;
+        document.getElementById('editSdt').value = item.sdt;
+        document.getElementById('editNgayCap').value = item.ngaycap ? item.ngaycap.split('T')[0] : '';
+        document.getElementById('editNgayHetHan').value = item.ngayhethan ? item.ngayhethan.split('T')[0] : '';
+        document.getElementById('editHangBH').value = item.hangbh;
+        document.getElementById('editLoaiXe').value = item.loaixe;
+        document.getElementById('editBienSo').value = item.bienso;
+        document.getElementById('editNote').value = item.note;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    async function saveBaoHiem() {
+        const id = document.getElementById('editId').value;
+        const data = {
+            tenkhach: document.getElementById('editTenKhach').value,
+            sdt: document.getElementById('editSdt').value,
+            ngaycap: document.getElementById('editNgayCap').value,
+            ngayhethan: document.getElementById('editNgayHetHan').value,
+            hangbh: document.getElementById('editHangBH').value,
+            loaixe: document.getElementById('editLoaiXe').value,
+            bienso: document.getElementById('editBienSo').value.toUpperCase(),
+            note: document.getElementById('editNote').value
+        };
+        const res = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if(res.ok) { closeModal(); loadData(); }
+    }
+
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+    function updateNotification() {
+        const count = danhSachGoc.filter(item => {
+            const st = getTrangThai(item.ngayhethan);
+            return st.key === "SAP_HET";
+        }).length;
+        if(count > 0) {
+            document.getElementById('notificationBar').style.display = 'flex';
+            document.getElementById('countExpiring').innerText = count;
+        } else {
+            document.getElementById('notificationBar').style.display = 'none';
         }
+    }
 
-        function editBaoHiem(id) {
-            const item = danhSachBaoHiem.find(x => x.id === id);
-            if (!item) return;
+    // Đóng filter khi bấm ra ngoài
+    window.onclick = () => document.getElementById('filterMenu').classList.remove('show');
 
-            document.getElementById('editId').value = item.id;
-            document.getElementById('editTenKhach').value = item.tenkhach || '';
-            document.getElementById('editSdt').value = item.sdt || '';
-            document.getElementById('editNgayCap').value = item.ngaycap ? item.ngaycap.split('T')[0] : '';
-            document.getElementById('editNgayHetHan').value = item.ngayhethan ? item.ngayhethan.split('T')[0] : '';
-            document.getElementById('editHangBH').value = item.hangbh || '';
-            document.getElementById('editLoaiXe').value = item.loaixe || '';
-            document.getElementById('editBienSo').value = item.bienso || '';
-            document.getElementById('editNote').value = item.note || '';
-
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        async function saveBaoHiem() {
-            const id = document.getElementById('editId').value;
-            const data = {
-                tenkhach: document.getElementById('editTenKhach').value.trim(),
-                sdt: document.getElementById('editSdt').value.trim(),
-                ngaycap: document.getElementById('editNgayCap').value,
-                ngayhethan: document.getElementById('editNgayHetHan').value,
-                hangbh: document.getElementById('editHangBH').value.trim(),
-                loaixe: document.getElementById('editLoaiXe').value.trim(),
-                bienso: document.getElementById('editBienSo').value.trim().toUpperCase(),
-                note: document.getElementById('editNote').value.trim()
-            };
-
-            try {
-                const url = id ? `${API_URL}/${id}` : API_URL;
-                const res = await fetch(url, {
-                    method: id ? 'PUT' : 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (res.ok) {
-                    alert("✅ Lưu thành công!");
-                    closeModal();
-                    loadData();
-                } else {
-                    alert("❌ Lưu thất bại!");
-                }
-            } catch (err) {
-                alert("❌ Không kết nối được với server");
-            }
-        }
-
-        async function deleteBaoHiem(id) {
-            if (!confirm("Xóa thật không?")) return;
-            try {
-                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-                loadData();
-            } catch (err) {
-                alert("Lỗi khi xóa");
-            }
-        }
-
-        function editNoteInline(cell, id) {
-            const current = cell.textContent.trim() === '(Chưa có ghi chú)' ? '' : cell.textContent.trim();
-            const input = document.createElement('textarea');
-            input.value = current;
-            input.style.width = "100%";
-            input.style.height = "60px";
-            cell.innerHTML = '';
-            cell.appendChild(input);
-            input.focus();
-
-            const save = async () => {
-                try {
-                    await fetch(`${API_URL}/${id}`, {
-                        method: 'PUT',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ note: input.value.trim() })
-                    });
-                    loadData();
-                } catch(e) { alert("Lỗi cập nhật note"); }
-            };
-            input.onblur = save;
-            input.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } };
-        }
-
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-
-        function checkThongBaoDo() {
-            const today = new Date();
-            let count = danhSachBaoHiem.filter(item => {
-                const diff = Math.ceil((new Date(item.ngayhethan) - today) / 86400000);
-                return diff > 0 && diff <= 30;
-            }).length;
-
-            const bar = document.getElementById('notificationBar');
-            if (count > 0) {
-                document.getElementById('countExpiring').textContent = count;
-                bar.style.display = 'flex';
-            } else {
-                bar.style.display = 'none';
-            }
-        }
-
-        function toggleFilter() {
-            alert("Tính năng lọc trạng thái đang được xây dựng lại. Bạn có thể dùng tìm kiếm ở trên.");
-            // Nếu bạn muốn khôi phục filter menu cũ, nói mình biết để thêm lại
-        }
-
-        function searchTable() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!keyword) return renderTable();
-
-            const filtered = danhSachBaoHiem.filter(item =>
-                (item.tenkhach || '').toLowerCase().includes(keyword) ||
-                (item.sdt || '').includes(keyword) ||
-                (item.bienso || '').toLowerCase().includes(keyword) ||
-                (item.hangbh || '').toLowerCase().includes(keyword)
-            );
-            // Render filtered list
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            // Tạm render full cho đơn giản, bạn có thể cải tiến sau
-            renderTable();
-        }
-
-        function exportData() {
-            let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
-            danhSachBaoHiem.forEach((item, i) => {
-                const status = getTrangThai(item.ngayhethan);
-                csv += `${i+1},"${item.tenkhach || ''}","${item.sdt || ''}",${item.ngaycap || ''},${item.ngayhethan || ''},"${item.hangbh || ''}","${item.loaixe || ''}","${item.bienso || ''}","${item.note || ''}","${status.text}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `BaoHiem_Oto_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
-        }
-
-        function logout() {
-            if (confirm("Bạn có chắc muốn đăng xuất?")) {
-                localStorage.clear();
-                window.location.href = "login.html";
-            }
-        }
-
-        function switchToHome() { window.location.href = "index.html"; }
-        function switchToAdd() { window.location.href = "index.html"; }
-
-        window.onload = loadData;
-    </script>
+    window.onload = loadData;
+</script>
 </body>
 </html>
