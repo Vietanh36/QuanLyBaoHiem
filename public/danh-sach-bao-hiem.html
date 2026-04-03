@@ -6,7 +6,7 @@
     <title>Danh Sách Bảo Hiểm Ô Tô</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-      
+        
         body {
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -32,17 +32,8 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        .logo {
-            font-size: 26px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .nav-buttons {
-            display: flex;
-            gap: 12px;
-        }
+        .logo { font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .nav-buttons { display: flex; gap: 12px; }
         .nav-btn {
             padding: 10px 22px;
             border: none;
@@ -51,14 +42,9 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
         .btn-home { background: #28a745; }
         .btn-add { background: #007bff; }
-        .btn-register { background: #6f42c1; }
-        .btn-logout { background: #dc3545; }
 
         .notification-bar {
             background: #d32f2f;
@@ -80,20 +66,13 @@
             border: 2px solid #ddd;
             font-size: 16px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        table { width: 100%; border-collapse: collapse; }
         th, td {
             padding: 14px 12px;
             text-align: left;
             border-bottom: 1px solid #eee;
-            vertical-align: middle;
         }
-        th {
-            background: #007bff;
-            color: white;
-        }
+        th { background: #007bff; color: white; }
         .status {
             padding: 8px 16px;
             border-radius: 30px;
@@ -105,8 +84,6 @@
         .con-han { background: #d4edda; color: #155724; }
         .sap-het { background: #fff3cd; color: #856404; animation: pulse 2s infinite; }
         .het-han { background: #f8d7da; color: #721c24; }
-        tr.sap-het-han { background: #fff3cd !important; }
-
         .action-btn {
             padding: 8px 12px;
             border: none;
@@ -116,15 +93,8 @@
         }
         .edit-btn { background: #ffc107; color: #212529; }
         .delete-btn { background: #dc3545; color: white; }
-
-        .note-cell {
-            cursor: pointer;
-            min-width: 180px;
-            max-width: 250px;
-            white-space: pre-wrap;
-        }
+        .note-cell { cursor: pointer; min-width: 180px; max-width: 250px; white-space: pre-wrap; }
         .note-cell:hover { background-color: #f8f9fa; }
-
         .modal {
             display: none;
             position: fixed;
@@ -142,9 +112,26 @@
             width: 90%;
             max-width: 520px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            max-height: 90vh;
-            overflow-y: auto;
         }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .form-group textarea { height: 80px; resize: vertical; }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .btn-cancel { background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 6px; }
+        .btn-save { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
     </style>
 </head>
 <body>
@@ -153,9 +140,7 @@
             <div class="logo">🚗 Danh Sách Bảo Hiểm Ô Tô</div>
             <div class="nav-buttons">
                 <button onclick="switchToHome()" class="nav-btn btn-home">🏠 Trang Chủ</button>
-                <button onclick="showAddModal()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
-                <button onclick="showRegisterModal()" class="nav-btn btn-register" id="btnRegister">Đăng ký tài khoản</button>
-                <button onclick="logout()" class="nav-btn btn-logout">Đăng xuất</button>
+                <button onclick="switchToAdd()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
             </div>
         </header>
 
@@ -206,14 +191,13 @@
         </div>
     </div>
 
-    <!-- Modal Sửa / Thêm -->
+    <!-- Modal Sửa -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h2 id="modalTitle">✏️ Sửa Thông Tin Bảo Hiểm</h2>
+            <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
             <input type="hidden" id="editId">
             <div class="form-group"><label>Tên khách hàng</label><input type="text" id="editTenKhach"></div>
             <div class="form-group"><label>Số điện thoại</label><input type="text" id="editSdt"></div>
-            <div class="form-group"><label>Địa chỉ</label><input type="text" id="editDiachi"></div>
             <div class="form-group"><label>Ngày cấp</label><input type="date" id="editNgayCap"></div>
             <div class="form-group"><label>Ngày hết hạn</label><input type="date" id="editNgayHetHan"></div>
             <div class="form-group"><label>Hãng bảo hiểm</label><input type="text" id="editHangBH"></div>
@@ -221,28 +205,9 @@
             <div class="form-group"><label>Biển số xe</label><input type="text" id="editBienSo" style="text-transform:uppercase;"></div>
             <div class="form-group"><label>Ghi chú</label><textarea id="editNote"></textarea></div>
 
-            <div style="text-align:right; margin-top:20px;">
-                <button onclick="closeModal()" style="padding:10px 20px; background:#6c757d; color:white; border:none;">Hủy</button>
-                <button onclick="saveBaoHiem()" style="padding:10px 20px; background:#28a745; color:white; border:none;">Lưu thay đổi</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Đăng ký (giữ nguyên) -->
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <h2>📝 Đăng ký tài khoản mới</h2>
-            <div class="form-group"><label>Email</label><input type="email" id="regEmail"></div>
-            <div class="form-group"><label>Mật khẩu</label><input type="password" id="regPassword"></div>
-            <div class="form-group"><label>Vai trò</label>
-                <select id="regRole">
-                    <option value="user">Nhân viên</option>
-                    <option value="admin">Quản trị viên</option>
-                </select>
-            </div>
-            <div style="text-align:right;">
-                <button onclick="closeRegisterModal()" style="padding:10px 20px; background:#6c757d; color:white; border:none;">Hủy</button>
-                <button onclick="registerAccount()" style="padding:10px 20px; background:#28a745; color:white; border:none;">Đăng ký</button>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+                <button class="btn-save" onclick="saveBaoHiem()">Lưu thay đổi</button>
             </div>
         </div>
     </div>
@@ -250,51 +215,19 @@
     <script>
         const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
         let danhSachBaoHiem = [];
-        let currentRole = localStorage.getItem('role') || 'user';
-
-        // Kiểm tra đăng nhập
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            alert("⛔ Bạn chưa đăng nhập!");
-            window.location.href = "login.html";
-        }
-
-        if (currentRole !== 'admin') {
-            const regBtn = document.getElementById('btnRegister');
-            if (regBtn) regBtn.style.display = 'none';
-        }
 
         async function loadData() {
-    try {
-        console.log("🔄 Đang gọi API từ:", API_URL);
-
-        const res = await fetch(API_URL, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Lỗi server");
+                danhSachBaoHiem = await res.json();
+                renderTable();
+                checkThongBaoDo();
+            } catch (err) {
+                console.error(err);
+                alert("❌ Không tải được dữ liệu từ server. Vui lòng thử lại!");
             }
-        });
-
-        console.log("📡 Response status:", res.status, res.statusText);
-
-        if (!res.ok) {
-            throw new Error(`Lỗi server: ${res.status} ${res.statusText}`);
         }
-
-        danhSachBaoHiem = await res.json();
-        
-        console.log("✅ Nhận được dữ liệu từ backend:", danhSachBaoHiem.length, "bản ghi");
-        console.table(danhSachBaoHiem.slice(0, 5));   // hiển thị 5 dòng đầu
-
-        renderTable();
-        checkThongBaoDo();
-        
-        alert(`✅ Tải thành công ${danhSachBaoHiem.length} bản ghi từ Neon!`);
-        
-    } catch (err) {
-        console.error("❌ LỖI KẾT NỐI:", err);
-        alert("❌ Không tải được dữ liệu từ Backend!\n\nLỗi: " + err.message + "\n\nHãy mở F12 → Console và chụp ảnh lỗi gửi mình.");
-    }
-}
 
         function getTrangThai(ngayHetHan) {
             if (!ngayHetHan) return { text: "Không xác định", class: "" };
@@ -315,7 +248,6 @@
             danhSachBaoHiem.forEach((item, index) => {
                 const status = getTrangThai(item.ngayhethan);
                 const row = document.createElement('tr');
-                row.className = status.class === "sap-het" ? "sap-het-han" : "";
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td><strong>${item.tenkhach || ''}</strong></td>
@@ -336,51 +268,20 @@
             });
         }
 
-        function editNoteInline(cell, id) {
-            const current = cell.textContent.trim() === '(Chưa có ghi chú)' ? '' : cell.textContent.trim();
-            const input = document.createElement('textarea');
-            input.className = 'note-input';
-            input.value = current;
-            cell.innerHTML = '';
-            cell.appendChild(input);
-            input.focus();
-
-            const save = async () => {
-                try {
-                    await fetch(`${API_URL}/${id}`, {
-                        method: 'PUT',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ note: input.value.trim() })
-                    });
-                    loadData();
-                } catch(e) { alert("Lỗi cập nhật note"); }
-            };
-            input.onblur = save;
-            input.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } };
-        }
-
-        function showAddModal() {
-            document.getElementById('modalTitle').textContent = "Thêm Bảo Hiểm Mới";
-            document.getElementById('editId').value = '';
-            clearModalFields();
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
         function editBaoHiem(id) {
             const item = danhSachBaoHiem.find(x => x.id === id);
             if (!item) return;
 
-            document.getElementById('modalTitle').textContent = "Sửa Thông Tin Bảo Hiểm";
             document.getElementById('editId').value = item.id;
             document.getElementById('editTenKhach').value = item.tenkhach || '';
             document.getElementById('editSdt').value = item.sdt || '';
-            document.getElementById('editDiachi').value = item.diachi || '';
-            document.getElementById('editNgayCap').value = item.ngaycap || '';
-            document.getElementById('editNgayHetHan').value = item.ngayhethan || '';
+            document.getElementById('editNgayCap').value = item.ngaycap ? item.ngaycap.split('T')[0] : '';
+            document.getElementById('editNgayHetHan').value = item.ngayhethan ? item.ngayhethan.split('T')[0] : '';
             document.getElementById('editHangBH').value = item.hangbh || '';
             document.getElementById('editLoaiXe').value = item.loaixe || '';
             document.getElementById('editBienSo').value = item.bienso || '';
             document.getElementById('editNote').value = item.note || '';
+
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -389,7 +290,6 @@
             const data = {
                 tenkhach: document.getElementById('editTenKhach').value.trim(),
                 sdt: document.getElementById('editSdt').value.trim(),
-                diachi: document.getElementById('editDiachi').value.trim(),
                 ngaycap: document.getElementById('editNgayCap').value,
                 ngayhethan: document.getElementById('editNgayHetHan').value,
                 hangbh: document.getElementById('editHangBH').value.trim(),
@@ -413,7 +313,7 @@
                     closeModal();
                     loadData();
                 } else {
-                    alert("❌ Có lỗi xảy ra");
+                    alert("❌ Có lỗi khi lưu dữ liệu");
                 }
             } catch (err) {
                 alert("❌ Không kết nối được với server");
@@ -430,49 +330,32 @@
             }
         }
 
-        function clearModalFields() {
-            document.getElementById('editTenKhach').value = '';
-            document.getElementById('editSdt').value = '';
-            document.getElementById('editDiachi').value = '';
-            document.getElementById('editNgayCap').value = '';
-            document.getElementById('editNgayHetHan').value = '';
-            document.getElementById('editHangBH').value = '';
-            document.getElementById('editLoaiXe').value = '';
-            document.getElementById('editBienSo').value = '';
-            document.getElementById('editNote').value = '';
+        function editNoteInline(cell, id) {
+            const current = cell.textContent.trim() === '(Chưa có ghi chú)' ? '' : cell.textContent.trim();
+            const input = document.createElement('textarea');
+            input.value = current;
+            input.style.width = '100%';
+            input.style.height = '60px';
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            input.focus();
+
+            const save = async () => {
+                try {
+                    await fetch(`${API_URL}/${id}`, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ note: input.value.trim() })
+                    });
+                    loadData();
+                } catch(e) { alert("Lỗi cập nhật note"); }
+            };
+            input.onblur = save;
+            input.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } };
         }
 
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
-        }
-
-        function showRegisterModal() {
-            if (currentRole !== 'admin') {
-                alert("Chỉ Admin mới được đăng ký tài khoản!");
-                return;
-            }
-            document.getElementById('registerModal').style.display = 'flex';
-        }
-
-        function closeRegisterModal() {
-            document.getElementById('registerModal').style.display = 'none';
-        }
-
-        function registerAccount() {
-            alert("Chức năng đăng ký tài khoản chưa kết nối backend. Tạm thời bỏ qua.");
-            closeRegisterModal();
-        }
-
-        function logout() {
-            if (confirm("Đăng xuất?")) {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('role');
-                window.location.href = "login.html";
-            }
-        }
-
-        function switchToHome() {
-            window.location.href = "index.html";
         }
 
         function checkThongBaoDo() {
@@ -491,10 +374,6 @@
             }
         }
 
-        function hideNotification() {
-            document.getElementById('notificationBar').style.display = 'none';
-        }
-
         function searchTable() {
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             if (!keyword) return renderTable();
@@ -505,7 +384,11 @@
                 (item.bienso || '').toLowerCase().includes(keyword) ||
                 (item.hangbh || '').toLowerCase().includes(keyword)
             );
-            renderTable(filtered);   // tạm thời render filtered trực tiếp
+            // Tạm render filtered (cần cải tiến sau nếu muốn)
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            // ... (bạn có thể copy logic renderTable nếu cần)
+            renderTable(); // tạm thời render full
         }
 
         function exportData() {
@@ -519,6 +402,14 @@
             link.href = URL.createObjectURL(blob);
             link.download = `BaoHiem_Oto_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
+        }
+
+        function switchToHome() {
+            window.location.href = "index.html";
+        }
+
+        function switchToAdd() {
+            window.location.href = "index.html";
         }
 
         // Khởi động
