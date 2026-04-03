@@ -260,7 +260,7 @@
         </div>
     </div>
 
-    <!-- Popup Sửa -->
+    <!-- Popup Sửa Thông Tin -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
@@ -336,12 +336,18 @@
         let sapXepTheoNgay = null;
 
         // ==================== KIỂM TRA ĐĂNG NHẬP ====================
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            alert("⛔ Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
-            window.location.href = "login.html";
+        function checkLogin() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            
+            if (!isLoggedIn) {
+                alert("⛔ Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
+                window.location.href = "login.html";
+                return false;
+            }
+            return true;
         }
 
-        const currentRole = localStorage.getItem('role');
+        const currentRole = localStorage.getItem('role') || 'user';
         const currentUsername = localStorage.getItem('username') || "Người dùng";
 
         // Ẩn nút Đăng ký nếu không phải Admin
@@ -459,6 +465,7 @@
             }
             const item = danhSachBaoHiem.find(x => x.id === id);
             if (!item) return;
+
             document.getElementById('editId').value = item.id;
             document.getElementById('editTenKhach').value = item.tenKhach || '';
             document.getElementById('editSdt').value = item.sdt || '';
@@ -468,6 +475,7 @@
             document.getElementById('editLoaiXe').value = item.loaiXe || '';
             document.getElementById('editBienSo').value = item.bienSo || '';
             document.getElementById('editNote').value = item.note || '';
+
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -513,7 +521,7 @@
 
         function showRegisterModal() {
             if (currentRole !== 'admin') {
-                alert("⛔ Chỉ Admin Tổng mới được đăng ký tài khoản!");
+                alert("⛔ Chỉ Admin mới được đăng ký tài khoản!");
                 return;
             }
             document.getElementById('registerModal').style.display = 'flex';
@@ -553,7 +561,11 @@
 
         function logout() {
             if (confirm("Bạn có chắc muốn đăng xuất?")) {
-                localStorage.clear();
+                // Chỉ xóa thông tin đăng nhập, GIỮ LẠI dữ liệu bảo hiểm
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('role');
+                localStorage.removeItem('username');
+                
                 window.location.href = "login.html";
             }
         }
@@ -657,8 +669,6 @@
 
         function exportData() {
             let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
-            const today = new Date();
-
             danhSachBaoHiem.forEach((item, i) => {
                 const status = getTrangThai(item.ngayHetHan);
                 csv += `${i+1},"${item.tenKhach || ''}","${item.sdt || ''}",${item.ngayCap || ''},${item.ngayHetHan || ''},"${item.hangBH || ''}","${item.loaiXe || ''}","${item.bienSo || ''}","${item.note || ''}","${status.text}"\n`;
@@ -672,7 +682,12 @@
             alert("✅ Đã xuất file Excel thành công!");
         }
 
-        window.onload = loadData;
+        // ==================== KHỞI ĐỘNG ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkLogin()) {
+                loadData();
+            }
+        });
     </script>
 </body>
 </html>
