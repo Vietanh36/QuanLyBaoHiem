@@ -136,13 +136,18 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="logo">🚗 Danh Sách Bảo Hiểm Ô Tô</div>
-            <div class="nav-buttons">
-                <button onclick="switchToHome()" class="nav-btn btn-home">🏠 Trang Chủ</button>
-                <button onclick="switchToAdd()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
-            </div>
-        </header>
+       <header>
+    <div class="logo">🚗 Danh Sách Bảo Hiểm Ô Tô</div>
+    <div class="nav-buttons">
+        <button onclick="switchToHome()" class="nav-btn btn-home">🏠 Trang Chủ</button>
+        <button onclick="switchToAdd()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
+        
+        <!-- Nút Đăng xuất -->
+        <button onclick="logout()" class="nav-btn btn-logout" style="background:#dc3545;">
+            Đăng xuất
+        </button>
+    </div>
+</header>
 
         <div class="main">
             <div id="notificationBar" class="notification-bar">
@@ -411,6 +416,22 @@
         function switchToAdd() {
             window.location.href = "index.html";
         }
+        function logout() {
+    if (confirm("Bạn có chắc muốn đăng xuất?")) {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('role');
+        localStorage.removeItem('username');
+        window.location.href = "login.html";
+    }
+}
+
+function switchToHome() {
+    window.location.href = "index.html";
+}
+
+function switchToAdd() {
+    window.location.href = "index.html";   // hoặc trang thêm nếu bạn có file riêng
+}
 
         // Khởi động
         window.onload = loadData;
