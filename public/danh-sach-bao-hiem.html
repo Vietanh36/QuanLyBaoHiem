@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Bảo Hiểm Ô Tô - Full Chức Năng</title>
+    <title>Hệ Thống Quản Lý Bảo Hiểm Ô Tô</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         
@@ -18,7 +18,7 @@
 
         .container { max-width: 100%; margin: 0 auto; padding: 20px; box-sizing: border-box; }
 
-        /* THÔNG BÁO */
+        /* THÔNG BÁO CẢNH BÁO */
         #alertBox {
             background: #ff4d4f; color: white; padding: 15px; border-radius: 8px;
             margin-bottom: 20px; display: none; align-items: center; justify-content: space-between;
@@ -33,7 +33,7 @@
         .controls { 
             display: flex; gap: 15px; padding: 15px;
             background: white; border-radius: 10px; border: 1px solid #e0e6ed;
-            align-items: center;
+            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
         .search-box { flex: 1; padding: 12px 20px; border-radius: 30px; border: 1px solid #ddd; outline: none; }
@@ -41,54 +41,57 @@
         .btn-add { background: #28a745; }
         .btn-refresh { background: #17a2b8; border-radius: 30px; }
 
-        /* BẢNG DỮ LIỆU - SỬA LỖI VỠ GIAO DIỆN */
+        /* BẢNG DỮ LIỆU - FIX LỖI VỠ TIÊU ĐỀ */
         .table-wrapper { 
             background: white; border-radius: 10px; border: 1px solid #e0e6ed; 
-            overflow-x: auto; margin-top: 10px;
+            overflow-x: auto; margin-top: 10px; position: relative;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 1400px; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; min-width: 1500px; table-layout: fixed; }
         
+        /* Cố định tiêu đề bảng */
         thead th { 
             background: #007bff; color: white; padding: 15px 10px; text-align: left; 
-            position: sticky; top: 135px; z-index: 900;
+            position: sticky; top: 0; z-index: 900;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
         }
 
         td { padding: 15px 10px; border-bottom: 1px solid #eee; font-size: 14px; word-wrap: break-word; }
         tr:hover { background-color: #f8fbff; }
 
-        /* Cố định độ rộng cột để không bị lệch */
-        .col-stt { width: 50px; text-align: center; }
-        .col-name { width: 150px; font-weight: bold; }
-        .col-address { width: 200px; }
-        .col-phone { width: 120px; }
-        .col-date { width: 110px; }
-        .col-brand { width: 100px; }
-        .col-type { width: 100px; }
-        .col-plate { width: 110px; }
-        .col-status { width: 140px; }
-        .col-action { width: 130px; text-align: center; }
+        /* ĐỊNH NGHĨA ĐỘ RỘNG CỘT CHUẨN (Fix lỗi lệch hàng) */
+        .w-stt { width: 50px; text-align: center; }
+        .w-name { width: 150px; font-weight: bold; }
+        .w-addr { width: 180px; }
+        .w-tel { width: 120px; }
+        .w-date { width: 100px; }
+        .w-brand { width: 100px; }
+        .w-type { width: 100px; }
+        .w-plate { width: 110px; }
+        .w-note { width: 150px; font-style: italic; color: #777; }
+        .w-status { width: 140px; }
+        .w-action { width: 120px; text-align: center; }
 
-        /* Trạng thái Badge */
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; min-width: 100px; text-align: center; }
+        /* Badge Trạng thái */
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 90px; text-align: center; }
         .st-conhan { background: #e6fcf5; color: #099268; }
         .st-saphet { background: #fff9db; color: #f08c00; }
         .st-hethan { background: #fff5f5; color: #fa5252; }
 
-        /* Bộ lọc Trạng thái */
-        .filter-dropdown { position: relative; display: inline-block; }
-        .filter-content {
+        /* Dropdown Lọc */
+        .filter-menu {
             display: none; position: absolute; background: white; color: #333;
             box-shadow: 0 8px 24px rgba(0,0,0,0.15); padding: 15px; border-radius: 8px;
-            z-index: 1200; top: 100%; right: 0; min-width: 150px;
+            z-index: 1200; top: 100%; right: 0; min-width: 150px; font-weight: normal;
         }
-        .filter-content.show { display: block; }
+        .filter-menu.show { display: block; }
 
-        /* Modal */
+        /* MODAL FORM - GIỮ NGUYÊN GIAO DIỆN CỦA BẠN */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 95%; max-width: 600px; border-radius: 15px; padding: 25px; max-height: 90vh; overflow-y: auto; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .form-group input, .form-group textarea { width: 100%; padding: 11px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .form-row { display: flex; gap: 15px; }
     </style>
 </head>
 <body>
@@ -109,7 +112,7 @@
 
     <div class="sticky-tools">
         <div class="controls">
-            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Tìm theo tên khách hàng, biển số, địa chỉ..." onkeyup="filterData()">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Tìm theo tên khách hàng, biển số, ghi chú..." onkeyup="filterData()">
             <button class="btn btn-refresh" onclick="loadData()">🔄 Tải lại dữ liệu</button>
         </div>
     </div>
@@ -118,26 +121,27 @@
         <table>
             <thead>
                 <tr>
-                    <th class="col-stt">STT</th>
-                    <th class="col-name">Khách hàng</th>
-                    <th class="col-address">Địa chỉ</th>
-                    <th class="col-phone">Số điện thoại</th>
-                    <th class="col-date">Ngày cấp</th>
-                    <th class="col-date" style="cursor:pointer" onclick="toggleSort()">Hết hạn <span id="sortDir">↓</span></th>
-                    <th class="col-brand">Hãng BH</th>
-                    <th class="col-type">Loại xe</th>
-                    <th class="col-plate">Biển số</th>
-                    <th class="col-status">
+                    <th class="w-stt">STT</th>
+                    <th class="w-name">Khách hàng</th>
+                    <th class="w-addr">Địa chỉ</th>
+                    <th class="w-tel">Số điện thoại</th>
+                    <th class="w-date">Ngày cấp</th>
+                    <th class="w-date" style="cursor:pointer" onclick="toggleSort()">Hết hạn <span id="sortDir">↓</span></th>
+                    <th class="w-brand">Hãng BH</th>
+                    <th class="w-type">Loại xe</th>
+                    <th class="w-plate">Biển số</th>
+                    <th class="w-note">Ghi chú</th>
+                    <th class="w-status">
                         Trạng thái 
-                        <span style="cursor:pointer" onclick="document.getElementById('filterMenu').classList.toggle('show'); event.stopPropagation();">▼</span>
-                        <div id="filterMenu" class="filter-content">
+                        <span style="cursor:pointer" onclick="toggleFilter(event)">▼</span>
+                        <div id="filterMenu" class="filter-menu">
                             <label><input type="checkbox" class="st-chk" value="CON_HAN" checked> Còn hạn</label><br>
                             <label><input type="checkbox" class="st-chk" value="SAP_HET" checked> Sắp hết</label><br>
                             <label><input type="checkbox" class="st-chk" value="HET_HAN" checked> Hết hạn</label><br>
-                            <button class="btn" style="background:#007bff; width:100%; margin-top:10px; padding:5px;" onclick="filterData()">Lọc</button>
+                            <button class="btn" style="background:#007bff; width:100%; margin-top:10px; padding:5px; font-size:12px;" onclick="filterData()">Áp dụng lọc</button>
                         </div>
                     </th>
-                    <th class="col-action">Thao tác</th>
+                    <th class="w-action">Hành động</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -147,24 +151,32 @@
 
 <div id="dataModal" class="modal">
     <div class="modal-content">
-        <h3 id="modalTitle">Thông tin bảo hiểm</h3>
+        <h3 id="modalTitle" style="margin-top:0; color:#007bff;">✏️ Thông Tin Bảo Hiểm</h3>
         <input type="hidden" id="f_id">
+        
         <div class="form-group"><label>Tên khách hàng</label><input type="text" id="f_tenkhach"></div>
         <div class="form-group"><label>Địa chỉ</label><input type="text" id="f_diachi"></div>
         <div class="form-group"><label>Số điện thoại</label><input type="text" id="f_sdt"></div>
-        <div style="display:flex; gap:10px">
+        
+        <div class="form-row">
             <div class="form-group" style="flex:1"><label>Ngày cấp</label><input type="date" id="f_ngaycap"></div>
             <div class="form-group" style="flex:1"><label>Ngày hết hạn</label><input type="date" id="f_ngayhethan"></div>
         </div>
-        <div style="display:flex; gap:10px">
+        
+        <div class="form-row">
             <div class="form-group" style="flex:1"><label>Hãng bảo hiểm</label><input type="text" id="f_hangbh"></div>
             <div class="form-group" style="flex:1"><label>Loại xe</label><input type="text" id="f_loaixe"></div>
         </div>
+        
         <div class="form-group"><label>Biển số xe</label><input type="text" id="f_bienso" style="text-transform:uppercase"></div>
         
-        <div style="text-align:right; margin-top:20px">
-            <button class="btn" style="background:#6c757d" onclick="closeModal()">Hủy</button>
-            <button class="btn" style="background:#28a745" onclick="saveData()">Lưu vào Neon</button>
+        <div class="form-group"><label>Ghi chú</label>
+            <textarea id="f_note" rows="3" placeholder="Nhập ghi chú tại đây..."></textarea>
+        </div>
+        
+        <div style="text-align:right; margin-top:10px">
+            <button class="btn" style="background:#6c757d" onclick="closeModal()">Hủy bỏ</button>
+            <button class="btn" style="background:#28a745" onclick="saveData()">Lưu vào hệ thống</button>
         </div>
     </div>
 </div>
@@ -180,7 +192,7 @@
             listData = await res.json();
             checkUpcomingExpirations();
             renderTable(listData);
-        } catch (e) { alert("Lỗi tải dữ liệu!"); }
+        } catch (e) { console.error("Lỗi:", e); }
     }
 
     function checkUpcomingExpirations() {
@@ -191,10 +203,8 @@
         const alertBox = document.getElementById('alertBox');
         if (upcoming.length > 0) {
             alertBox.style.display = 'flex';
-            document.getElementById('alertText').innerText = `📢 Có ${upcoming.length} bảo hiểm sắp hết hạn (trong 30 ngày tới)!`;
-        } else {
-            alertBox.style.display = 'none';
-        }
+            document.getElementById('alertText').innerText = `📢 Phát hiện ${upcoming.length} bảo hiểm sắp tới hạn. Vui lòng kiểm tra!`;
+        } else { alertBox.style.display = 'none'; }
     }
 
     function renderTable(data) {
@@ -209,17 +219,18 @@
             const st = getStatus(item.ngayhethan);
             tbody.innerHTML += `
                 <tr>
-                    <td class="col-stt">${idx + 1}</td>
-                    <td class="col-name">${item.tenkhach || ''}</td>
-                    <td class="col-address">${item.diachi || ''}</td>
-                    <td class="col-phone">${item.sdt || ''}</td>
-                    <td class="col-date">${item.ngaycap ? new Date(item.ngaycap).toLocaleDateString('vi-VN') : ''}</td>
-                    <td class="col-date"><b>${new Date(item.ngayhethan).toLocaleDateString('vi-VN')}</b></td>
-                    <td class="col-brand">${item.hangbh || ''}</td>
-                    <td class="col-type">${item.loaixe || ''}</td>
-                    <td class="col-plate">${item.bienso || ''}</td>
-                    <td class="col-status"><span class="badge ${st.class}">${st.text}</span></td>
-                    <td class="col-action">
+                    <td class="w-stt">${idx + 1}</td>
+                    <td class="w-name">${item.tenkhach || ''}</td>
+                    <td class="w-addr">${item.diachi || ''}</td>
+                    <td class="w-tel">${item.sdt || ''}</td>
+                    <td class="w-date">${item.ngaycap ? new Date(item.ngaycap).toLocaleDateString('vi-VN') : ''}</td>
+                    <td class="w-date"><b>${new Date(item.ngayhethan).toLocaleDateString('vi-VN')}</b></td>
+                    <td class="w-brand">${item.hangbh || ''}</td>
+                    <td class="w-type">${item.loaixe || ''}</td>
+                    <td class="w-plate" style="text-transform:uppercase">${item.bienso || ''}</td>
+                    <td class="w-note">${item.note || '(Trống)'}</td>
+                    <td class="w-status"><span class="badge ${st.class}">${st.text}</span></td>
+                    <td class="w-action">
                         <button onclick="openModal(${item.id})" style="color:#f0ad4e; background:none; border:none; cursor:pointer; font-weight:bold">Sửa</button> | 
                         <button onclick="deleteData(${item.id})" style="color:#d9534f; background:none; border:none; cursor:pointer; font-weight:bold">Xóa</button>
                     </td>
@@ -231,7 +242,7 @@
         const diff = Math.ceil((new Date(dateStr) - new Date().setHours(0,0,0,0)) / 86400000);
         if (diff < 0) return { text: "HẾT HẠN", class: "st-hethan", key: "HET_HAN" };
         if (diff <= 30) return { text: `SẮP HẾT (${diff}n)`, class: "st-saphet", key: "SAP_HET" };
-        return { text: "CÒN HẠN", class: "st-conhan", key: "CON_HAN" };
+        return { text: `CÒN HẠN (${diff}n)`, class: "st-conhan", key: "CON_HAN" };
     }
 
     function filterData() {
@@ -240,10 +251,13 @@
         
         const filtered = listData.filter(item => {
             const stKey = getStatus(item.ngayhethan).key;
-            const matchSearch = (item.tenkhach||'').toLowerCase().includes(query) || (item.bienso||'').toLowerCase().includes(query);
+            const matchSearch = (item.tenkhach||'').toLowerCase().includes(query) || 
+                              (item.bienso||'').toLowerCase().includes(query) || 
+                              (item.note||'').toLowerCase().includes(query);
             return matchSearch && activeSt.includes(stKey);
         });
         renderTable(filtered);
+        document.getElementById('filterMenu').classList.remove('show');
     }
 
     async function saveData() {
@@ -256,14 +270,12 @@
             ngayhethan: document.getElementById('f_ngayhethan').value,
             hangbh: document.getElementById('f_hangbh').value,
             loaixe: document.getElementById('f_loaixe').value,
-            bienso: document.getElementById('f_bienso').value.toUpperCase()
+            bienso: document.getElementById('f_bienso').value.toUpperCase(),
+            note: document.getElementById('f_note').value
         };
 
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? `${API_URL}/${id}` : API_URL;
-
-        const res = await fetch(url, {
-            method,
+        const res = await fetch(id ? `${API_URL}/${id}` : API_URL, {
+            method: id ? 'PUT' : 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
@@ -275,24 +287,26 @@
         if(id) {
             const item = listData.find(x => x.id === id);
             document.getElementById('f_id').value = item.id;
-            document.getElementById('f_tenkhach').value = item.tenkhach;
-            document.getElementById('f_diachi').value = item.diachi;
-            document.getElementById('f_sdt').value = item.sdt;
+            document.getElementById('f_tenkhach').value = item.tenkhach || "";
+            document.getElementById('f_diachi').value = item.diachi || "";
+            document.getElementById('f_sdt').value = item.sdt || "";
             document.getElementById('f_ngaycap').value = item.ngaycap ? item.ngaycap.split('T')[0] : '';
             document.getElementById('f_ngayhethan').value = item.ngayhethan ? item.ngayhethan.split('T')[0] : '';
-            document.getElementById('f_hangbh').value = item.hangbh;
-            document.getElementById('f_loaixe').value = item.loaixe;
-            document.getElementById('f_bienso').value = item.bienso;
+            document.getElementById('f_hangbh').value = item.hangbh || "";
+            document.getElementById('f_loaixe').value = item.loaixe || "";
+            document.getElementById('f_bienso').value = item.bienso || "";
+            document.getElementById('f_note').value = item.note || "";
         } else {
             document.getElementById('f_id').value = "";
-            document.querySelectorAll('.modal-content input').forEach(i => i.value = "");
+            document.querySelectorAll('.modal-content input, .modal-content textarea').forEach(i => i.value = "");
         }
         document.getElementById('dataModal').style.display = 'flex';
     }
 
     function closeModal() { document.getElementById('dataModal').style.display = 'none'; }
     function toggleSort() { isSortDesc = !isSortDesc; document.getElementById('sortDir').innerText = isSortDesc ? '↓' : '↑'; renderTable(listData); }
-    async function deleteData(id) { if(confirm("Xóa dòng này?")) { await fetch(`${API_URL}/${id}`, {method:'DELETE'}); loadData(); } }
+    function toggleFilter(e) { e.stopPropagation(); document.getElementById('filterMenu').classList.toggle('show'); }
+    async function deleteData(id) { if(confirm("Xác nhận xóa dữ liệu này?")) { await fetch(`${API_URL}/${id}`, {method:'DELETE'}); loadData(); } }
     
     window.onclick = () => document.getElementById('filterMenu').classList.remove('show');
     window.onload = loadData;
