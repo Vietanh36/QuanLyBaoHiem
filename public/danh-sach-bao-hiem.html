@@ -401,6 +401,8 @@ window.addEventListener("focus", function () {
             tbody.innerHTML = '';
 
             let listToRender = filteredList || danhSachBaoHiem;
+            // ✅ Sắp xếp mới → cũ (theo id)
+            listToRender.sort((a, b) => b.id - a.id);
 
             if (trangThaiFilter !== "ALL") {
                 listToRender = listToRender.filter(item => {
