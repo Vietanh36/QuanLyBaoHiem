@@ -196,19 +196,44 @@
         </div>
     </div>
 
-    <!-- Modal Sửa -->
+       <!-- ==================== MODAL SỬA ==================== -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
             <input type="hidden" id="editId">
-            <div class="form-group"><label>Tên khách hàng</label><input type="text" id="editTenKhach"></div>
-            <div class="form-group"><label>Số điện thoại</label><input type="text" id="editSdt"></div>
-            <div class="form-group"><label>Ngày cấp</label><input type="date" id="editNgayCap"></div>
-            <div class="form-group"><label>Ngày hết hạn</label><input type="date" id="editNgayHetHan"></div>
-            <div class="form-group"><label>Hãng bảo hiểm</label><input type="text" id="editHangBH"></div>
-            <div class="form-group"><label>Loại xe</label><input type="text" id="editLoaiXe"></div>
-            <div class="form-group"><label>Biển số xe</label><input type="text" id="editBienSo" style="text-transform:uppercase;"></div>
-            <div class="form-group"><label>Ghi chú</label><textarea id="editNote"></textarea></div>
+
+            <div class="form-group">
+                <label>Tên khách hàng</label>
+                <input type="text" id="editTenKhach">
+            </div>
+            <div class="form-group">
+                <label>Số điện thoại</label>
+                <input type="text" id="editSdt">
+            </div>
+            <div class="form-group">
+                <label>Ngày cấp</label>
+                <input type="date" id="editNgayCap">
+            </div>
+            <div class="form-group">
+                <label>Ngày hết hạn</label>
+                <input type="date" id="editNgayHetHan">
+            </div>
+            <div class="form-group">
+                <label>Hãng bảo hiểm</label>
+                <input type="text" id="editHangBH">
+            </div>
+            <div class="form-group">
+                <label>Loại xe</label>
+                <input type="text" id="editLoaiXe">
+            </div>
+            <div class="form-group">
+                <label>Biển số xe</label>
+                <input type="text" id="editBienSo" style="text-transform:uppercase;">
+            </div>
+            <div class="form-group">
+                <label>Ghi chú</label>
+                <textarea id="editNote" rows="3"></textarea>
+            </div>
 
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">Hủy</button>
@@ -221,31 +246,20 @@
         const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
         let danhSachBaoHiem = [];
 
+        // Load dữ liệu
         async function loadData() {
             try {
                 const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("Lỗi server");
                 danhSachBaoHiem = await res.json();
                 renderTable();
                 checkThongBaoDo();
             } catch (err) {
                 console.error(err);
-                alert("❌ Không tải được dữ liệu từ server. Vui lòng thử lại!");
+                alert("❌ Không tải được dữ liệu từ server!");
             }
         }
 
-        function getTrangThai(ngayHetHan) {
-            if (!ngayHetHan) return { text: "Không xác định", class: "" };
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            const hetHan = new Date(ngayHetHan);
-            const diffDays = Math.ceil((hetHan - today) / (1000*60*60*24));
-
-            if (diffDays < 0) return { text: "HẾT HẠN", class: "het-han" };
-            if (diffDays <= 30) return { text: `SẮP HẾT (${diffDays} ngày)`, class: "sap-het" };
-            return { text: `CÒN HẠN (${diffDays} ngày)`, class: "con-han" };
-        }
-
+        // Render bảng
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -257,8 +271,8 @@
                     <td>${index + 1}</td>
                     <td><strong>${item.tenkhach || ''}</strong></td>
                     <td>${item.sdt || ''}</td>
-                    <td>${item.ngaycap || ''}</td>
-                    <td><strong>${item.ngayhethan || ''}</strong></td>
+                    <td>${formatDate(item.ngaycap)}</td>
+                    <td><strong>${formatDate(item.ngayhethan)}</strong></td>
                     <td>${item.hangbh || ''}</td>
                     <td>${item.loaixe || ''}</td>
                     <td style="text-transform:uppercase;">${item.bienso || ''}</td>
@@ -273,6 +287,23 @@
             });
         }
 
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function getTrangThai(ngayHetHan) {
+            if (!ngayHetHan) return { text: "Không xác định", class: "" };
+            const today = new Date();
+            const hetHan = new Date(ngayHetHan);
+            const diffDays = Math.ceil((hetHan - today) / (86400000));
+
+            if (diffDays < 0) return { text: "HẾT HẠN", class: "het-han" };
+            if (diffDays <= 30) return { text: `SẮP HẾT (${diffDays} ngày)`, class: "sap-het" };
+            return { text: `CÒN HẠN (${diffDays} ngày)`, class: "con-han" };
+        }
+
+        // Mở form sửa
         function editBaoHiem(id) {
             const item = danhSachBaoHiem.find(x => x.id === id);
             if (!item) return;
@@ -290,6 +321,7 @@
             document.getElementById('editModal').style.display = 'flex';
         }
 
+        // Lưu form sửa
         async function saveBaoHiem() {
             const id = document.getElementById('editId').value;
             const data = {
@@ -305,20 +337,18 @@
 
             try {
                 const url = id ? `${API_URL}/${id}` : API_URL;
-                const method = id ? 'PUT' : 'POST';
-
                 const res = await fetch(url, {
-                    method: method,
+                    method: id ? 'PUT' : 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
                 if (res.ok) {
-                    alert(id ? "✅ Cập nhật thành công!" : "✅ Thêm thành công!");
+                    alert("✅ Lưu thành công!");
                     closeModal();
                     loadData();
                 } else {
-                    alert("❌ Có lỗi khi lưu dữ liệu");
+                    alert("❌ Lưu thất bại!");
                 }
             } catch (err) {
                 alert("❌ Không kết nối được với server");
@@ -326,7 +356,7 @@
         }
 
         async function deleteBaoHiem(id) {
-            if (!confirm("Bạn có chắc muốn xóa?")) return;
+            if (!confirm("Xóa thật không?")) return;
             try {
                 await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
                 loadData();
@@ -339,8 +369,8 @@
             const current = cell.textContent.trim() === '(Chưa có ghi chú)' ? '' : cell.textContent.trim();
             const input = document.createElement('textarea');
             input.value = current;
-            input.style.width = '100%';
-            input.style.height = '60px';
+            input.style.width = "100%";
+            input.style.height = "60px";
             cell.innerHTML = '';
             cell.appendChild(input);
             input.focus();
@@ -366,7 +396,7 @@
         function checkThongBaoDo() {
             const today = new Date();
             let count = danhSachBaoHiem.filter(item => {
-                const diff = Math.ceil((new Date(item.ngayhethan) - today) / (86400000));
+                const diff = Math.ceil((new Date(item.ngayhethan) - today) / 86400000);
                 return diff > 0 && diff <= 30;
             }).length;
 
@@ -379,34 +409,12 @@
             }
         }
 
-        function searchTable() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!keyword) return renderTable();
-
-            const filtered = danhSachBaoHiem.filter(item =>
-                (item.tenkhach || '').toLowerCase().includes(keyword) ||
-                (item.sdt || '').includes(keyword) ||
-                (item.bienso || '').toLowerCase().includes(keyword) ||
-                (item.hangbh || '').toLowerCase().includes(keyword)
-            );
-            // Tạm render filtered (cần cải tiến sau nếu muốn)
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            // ... (bạn có thể copy logic renderTable nếu cần)
-            renderTable(); // tạm thời render full
-        }
-
-        function exportData() {
-            let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
-            danhSachBaoHiem.forEach((item, i) => {
-                const status = getTrangThai(item.ngayhethan);
-                csv += `${i+1},"${item.tenkhach || ''}","${item.sdt || ''}",${item.ngaycap || ''},${item.ngayhethan || ''},"${item.hangbh || ''}","${item.loaixe || ''}","${item.bienso || ''}","${item.note || ''}","${status.text}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `BaoHiem_Oto_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
+        // Nút Đăng xuất
+        function logout() {
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+                localStorage.clear();
+                window.location.href = "login.html";
+            }
         }
 
         function switchToHome() {
@@ -416,22 +424,6 @@
         function switchToAdd() {
             window.location.href = "index.html";
         }
-        function logout() {
-    if (confirm("Bạn có chắc muốn đăng xuất?")) {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('role');
-        localStorage.removeItem('username');
-        window.location.href = "login.html";
-    }
-}
-
-function switchToHome() {
-    window.location.href = "index.html";
-}
-
-function switchToAdd() {
-    window.location.href = "index.html";   // hoặc trang thêm nếu bạn có file riêng
-}
 
         // Khởi động
         window.onload = loadData;
