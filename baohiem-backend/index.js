@@ -1,21 +1,31 @@
+// ==================== SERVER BACKEND - QUẢN LÝ BẢO HIỂM Ô TÔ ====================
 require('dotenv').config();
+
 const express = require('express');
-const { Pool } = require('pg');
 const cors = require('cors');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// ====================== MIDDLEWARE ======================
+app.use(cors({
+    origin: '*',                    // Dùng * để test nhanh (có thể thay sau)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type']
+}));
+
 app.use(express.json());
 
-// Kết nối Neon Postgres
+// ====================== KẾT NỐI NEON POSTGRES ======================
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
-// Test kết nối
+// ====================== TEST KẾT NỐI ======================
 app.get('/api/test', async (req, res) => {
     try {
         const result = await pool.query('SELECT NOW()');
@@ -30,7 +40,9 @@ app.get('/api/test', async (req, res) => {
     }
 });
 
-// Lấy tất cả dữ liệu bảo hiểm
+// ====================== API ROUTES ======================
+
+// Lấy tất cả bảo hiểm
 app.get('/api/baohiem', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -99,8 +111,13 @@ app.put('/api/baohiem/:id', async (req, res) => {
             RETURNING *
         `, [tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, note, id]);
 
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy bảo hiểm' });
+        }
+
         res.json({ success: true, message: 'Cập nhật thành công', data: result.rows[0] });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
@@ -109,13 +126,21 @@ app.put('/api/baohiem/:id', async (req, res) => {
 app.delete('/api/baohiem/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        await pool.query('DELETE FROM baohiemoto WHERE id = $1', [id]);
+        const result = await pool.query('DELETE FROM baohiemoto WHERE id = $1 RETURNING id', [id]);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy bảo hiểm' });
+        }
+
         res.json({ success: true, message: 'Xóa thành công' });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
+// ====================== KHỞI ĐỘNG SERVER ======================
 app.listen(PORT, () => {
-    console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
+    console.log(`🚀 Server đang chạy tại port ${PORT}`);
+    console.log(`📡 Test connection: http://localhost:${PORT}/api/test`);
 });
