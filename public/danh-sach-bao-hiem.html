@@ -3,97 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Bảo Hiểm Ô Tô Pro</title>
+    <title>Hệ Thống Quản Lý Bảo Hiểm Ô Tô</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:20px; }
-        .container { max-width: 1600px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
         
-        /* Header */
+        body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:20px; color: #333; }
+        .container { max-width: 1700px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        /* Header & Nav */
         header { background: #007bff; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: white; transition: 0.3s; }
+        .logo { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .nav-buttons { display: flex; gap: 12px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: 0.3s; color: white; text-decoration: none; }
         .btn-add { background: #28a745; }
         .btn-logout { background: #dc3545; }
-        .nav-btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        .btn:hover { opacity: 0.85; transform: translateY(-1px); }
 
         /* Notification */
-        .notification-bar { background: #ff4757; color: white; padding: 12px 20px; margin: 15px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; animation: slideDown 0.5s ease; }
-        @keyframes slideDown { from {transform: translateY(-20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+        .notification { background: #ff4757; color: white; padding: 12px 25px; margin: 20px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 
-        .main { padding: 20px; }
-        .controls { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; }
-        .search-box { flex: 1; padding: 12px 25px; border-radius: 30px; border: 1px solid #ddd; outline: none; font-size: 15px; }
+        /* Main Content */
+        .main { padding: 0 25px 25px 25px; }
+        .controls { display: flex; gap: 15px; margin-bottom: 20px; }
+        .search-box { flex: 1; padding: 12px 25px; border-radius: 30px; border: 1px solid #ddd; outline: none; font-size: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .btn-refresh { background: #17a2b8; color: white; padding: 0 20px; border-radius: 30px; border: none; cursor: pointer; }
 
         /* Table Style */
-        .table-wrapper { overflow-x: auto; border: 1px solid #eee; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1300px; }
-        th { background: #007bff; color: white; padding: 15px 10px; text-align: left; position: relative; }
-        td { padding: 15px 10px; border-bottom: 1px solid #eee; font-size: 14px; }
-        
-        /* Sắp xếp */
-        .sort-header { cursor: pointer; transition: 0.2s; }
-        .sort-header:hover { background: #0056b3; }
+        .table-wrapper { overflow-x: auto; border: 1px solid #eee; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1500px; }
+        th { background: #007bff; color: white; padding: 15px 12px; text-align: left; white-space: nowrap; }
+        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
+        tr:hover { background-color: #f8fbff; }
 
-        /* Excel Filter Dropdown */
+        /* Sort & Filter UI */
+        .sort-btn { cursor: pointer; user-select: none; transition: 0.2s; }
+        .sort-btn:hover { color: #ffeb3b; }
+
         .filter-container { position: relative; display: inline-block; }
-        .filter-icon { cursor: pointer; margin-left: 5px; font-size: 12px; border: 1px solid rgba(255,255,255,0.5); padding: 2px 4px; border-radius: 3px; }
-        .filter-dropdown { 
+        .filter-trigger { cursor: pointer; margin-left: 5px; font-size: 12px; border: 1px solid rgba(255,255,255,0.4); padding: 2px 5px; border-radius: 4px; }
+        .filter-menu { 
             display: none; position: absolute; top: 100%; left: 0; 
-            background: white; color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            padding: 15px; border-radius: 10px; z-index: 999; min-width: 200px;
-            font-weight: normal; margin-top: 10px; border: 1px solid #ddd;
+            background: white; color: #333; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            padding: 15px; border-radius: 12px; z-index: 1000; min-width: 220px;
+            margin-top: 12px; border: 1px solid #eee;
         }
-        .filter-dropdown.show { display: block; }
-        .filter-item { display: flex; align-items: center; gap: 12px; padding: 10px; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+        .filter-menu.show { display: block; }
+        .filter-item { display: flex; align-items: center; gap: 12px; padding: 10px; cursor: pointer; border-radius: 8px; transition: 0.2s; }
         .filter-item:hover { background: #f1f3f5; }
         .filter-item input { width: 18px; height: 18px; cursor: pointer; }
+        .filter-item label { cursor: pointer; flex: 1; font-weight: 500; }
+
         .filter-footer { border-top: 1px solid #eee; margin-top: 12px; padding-top: 12px; display: flex; gap: 10px; }
-        .btn-f { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .btn-action { flex: 1; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
-        /* Badges */
-        .status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; min-width: 120px; text-align: center; }
-        .con-han { background: #e6fcf5; color: #099268; }
-        .sap-het { background: #fff9db; color: #f08c00; }
-        .het-han { background: #fff5f5; color: #fa5252; }
+        /* Status Badge */
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; min-width: 125px; text-align: center; }
+        .st-conhan { background: #e6fcf5; color: #099268; }
+        .st-saphet { background: #fff9db; color: #f08c00; }
+        .st-hethan { background: #fff5f5; color: #fa5252; }
 
-        /* Modal Scroll Fix */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 95%; max-width: 550px; border-radius: 15px; display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        .modal-header { padding: 20px; border-bottom: 1px solid #eee; font-size: 18px; font-weight: bold; }
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
-        .modal-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 12px; background: #f8f9fa; border-radius: 0 0 15px 15px; }
+        /* Actions */
+        .btn-edit { background: #ffc107; color: #212529; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 5px; }
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
-        .btn-save { background: #28a745; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-close { background: #6c757d; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .modal-content { background: white; width: 95%; max-width: 600px; border-radius: 16px; display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid #eee; font-size: 20px; font-weight: bold; color: #007bff; }
+        .modal-body { padding: 25px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 12px; background: #f8f9fa; }
         
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #495057; }
-        .form-group input, .form-group textarea { width: 100%; padding: 11px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .form-group { flex: 1; margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #495057; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .form-group input:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 24px;">🛡️</span>
-            <span style="font-size: 20px; font-weight: 700; letter-spacing: 0.5px;">QUẢN LÝ BẢO HIỂM</span>
-        </div>
-        <div>
-            <button class="nav-btn btn-add" onclick="openAddModal()">+ Thêm Bảo Hiểm Mới</button>
-            <button class="nav-btn btn-logout" onclick="alert('Đăng xuất...')">Đăng xuất</button>
+        <div class="logo">🛡️ DANH SÁCH BẢO HIỂM Ô TÔ</div>
+        <div class="nav-buttons">
+            <button class="btn btn-add" onclick="openAddModal()">+ Thêm Bảo Hiểm Mới</button>
+            <button class="btn btn-logout" onclick="alert('Đăng xuất...')">Đăng xuất</button>
         </div>
     </header>
 
-    <div class="main">
-        <div id="notif" class="notification-bar">
-            <span>📢 Phát hiện <b id="notifCount">0</b> bảo hiểm sắp tới hạn. Vui lòng kiểm tra!</span>
-            <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:white; cursor:pointer; font-size: 20px;">×</button>
-        </div>
+    <div id="notifBar" class="notification">
+        <span>📢 Hệ thống phát hiện <b id="notifCount">0</b> bảo hiểm sắp hết hạn. Hãy kiểm tra ngay!</span>
+        <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:white; cursor:pointer; font-size: 22px;">&times;</button>
+    </div>
 
+    <div class="main">
         <div class="controls">
-            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Nhập tên khách hàng, biển số hoặc ghi chú để tìm nhanh..." onkeyup="filterData()">
-            <button onclick="loadData()" style="background: #17a2b8; color:white; border:none; padding:12px 20px; border-radius:30px; cursor:pointer; font-weight:500;"> làm mới</button>
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Tìm theo tên khách hàng, biển số xe, địa chỉ hoặc ghi chú..." onkeyup="filterTable()">
+            <button class="btn-refresh" onclick="loadData()">🔄 Tải lại dữ liệu</button>
         </div>
 
         <div class="table-wrapper">
@@ -102,37 +109,42 @@
                     <tr>
                         <th>STT</th>
                         <th>Khách hàng</th>
+                        <th>Địa chỉ</th>
                         <th>Số điện thoại</th>
                         <th>Ngày cấp</th>
-                        <th class="sort-header" onclick="sortDataByExpiry()">Ngày hết hạn <span id="sortDir">↓</span></th>
+                        <th class="sort-btn" onclick="toggleSort()">Ngày hết hạn <span id="sortIcon">↓</span></th>
                         <th>Hãng BH</th>
                         <th>Loại xe</th>
                         <th>Biển số</th>
                         <th>Ghi chú</th>
                         <th>
                             <div class="filter-container">
-                                Trạng thái <span class="filter-icon" onclick="toggleFilter(event)">▼</span>
-                                <div id="filterMenu" class="filter-dropdown" onclick="event.stopPropagation()">
-                                    <div class="filter-item" onclick="toggleCheckbox('cb1')">
-                                        <input type="checkbox" id="cb1" class="st-cb" value="CON_HAN" checked> Còn hạn
+                                Trạng thái <span class="filter-trigger" onclick="toggleFilterMenu(event)">▼</span>
+                                <div id="filterMenu" class="filter-menu" onclick="event.stopPropagation()">
+                                    <div class="filter-item">
+                                        <input type="checkbox" id="chkConHan" class="status-chk" value="CON_HAN" checked>
+                                        <label for="chkConHan">Còn hạn</label>
                                     </div>
-                                    <div class="filter-item" onclick="toggleCheckbox('cb2')">
-                                        <input type="checkbox" id="cb2" class="st-cb" value="SAP_HET" checked> Sắp hết
+                                    <div class="filter-item">
+                                        <input type="checkbox" id="chkSapHet" class="status-chk" value="SAP_HET" checked>
+                                        <label for="chkSapHet">Sắp hết hạn</label>
                                     </div>
-                                    <div class="filter-item" onclick="toggleCheckbox('cb3')">
-                                        <input type="checkbox" id="cb3" class="st-cb" value="HET_HAN" checked> Hết hạn
+                                    <div class="filter-item">
+                                        <input type="checkbox" id="chkHetHan" class="status-chk" value="HET_HAN" checked>
+                                        <label for="chkHetHan">Hết hạn</label>
                                     </div>
                                     <div class="filter-footer">
-                                        <button class="btn-f" style="background:#dee2e6;" onclick="checkAll(true)">Tất cả</button>
-                                        <button class="btn-f" style="background:#007bff; color:white;" onclick="filterData(true)">Lọc ngay</button>
+                                        <button class="btn-action" style="background:#e9ecef;" onclick="setAllFilters(true)">Tất cả</button>
+                                        <button class="btn-action" style="background:#007bff; color:white;" onclick="filterTable(true)">Lọc ngay</button>
                                     </div>
                                 </div>
                             </div>
                         </th>
-                        <th>Thao tác</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody"></tbody>
+                <tbody id="tableBody">
+                    </tbody>
             </table>
         </div>
     </div>
@@ -140,159 +152,216 @@
 
 <div id="dataModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header" id="modalTitle">Cập nhật thông tin</div>
+        <div class="modal-header" id="modalTitle">Cập nhật thông tin bảo hiểm</div>
         <div class="modal-body">
-            <input type="hidden" id="fId">
-            <div class="form-group"><label>Tên khách hàng</label><input type="text" id="fTen"></div>
-            <div class="form-group"><label>Số điện thoại</label><input type="text" id="fSdt"></div>
-            <div style="display: flex; gap: 10px;">
-                <div class="form-group" style="flex:1;"><label>Ngày cấp</label><input type="date" id="fCap"></div>
-                <div class="form-group" style="flex:1;"><label>Ngày hết hạn</label><input type="date" id="fHet"></div>
+            <input type="hidden" id="fieldId">
+            <div class="form-group"><label>Tên khách hàng</label><input type="text" id="fieldTen"></div>
+            <div class="form-group"><label>Địa chỉ</label><input type="text" id="fieldDiaChi"></div>
+            <div class="form-group"><label>Số điện thoại</label><input type="text" id="fieldSdt"></div>
+            <div class="form-row">
+                <div class="form-group"><label>Ngày cấp</label><input type="date" id="fieldCap"></div>
+                <div class="form-group"><label>Ngày hết hạn</label><input type="date" id="fieldHet"></div>
             </div>
-            <div class="form-group"><label>Hãng bảo hiểm</label><input type="text" id="fHang"></div>
-            <div class="form-group"><label>Loại xe</label><input type="text" id="fLoai"></div>
-            <div class="form-group"><label>Biển số</label><input type="text" id="fBien" style="text-transform:uppercase;"></div>
-            <div class="form-group"><label>Ghi chú</label><textarea id="fNote" rows="3"></textarea></div>
+            <div class="form-row">
+                <div class="form-group"><label>Hãng bảo hiểm</label><input type="text" id="fieldHang"></div>
+                <div class="form-group"><label>Loại xe</label><input type="text" id="fieldLoai"></div>
+            </div>
+            <div class="form-group"><label>Biển số xe</label><input type="text" id="fieldBien" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Ghi chú</label><textarea id="fieldNote" rows="3"></textarea></div>
         </div>
         <div class="modal-footer">
-            <button class="btn-close" onclick="closeModal()">Hủy</button>
-            <button class="btn-save" onclick="saveAction()">Lưu dữ liệu</button>
+            <button class="btn" style="background:#6c757d;" onclick="closeModal()">Đóng</button>
+            <button class="btn" style="background:#28a745;" onclick="handleSave()">Lưu dữ liệu</button>
         </div>
     </div>
 </div>
 
 <script>
-    const API = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
-    let rawData = [];
-    let sortMode = 'DESC'; // Mặc định: Còn nhiều ngày nhất lên đầu
+    const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
+    let database = [];
+    let isDescOrder = true; // Mặc định: Còn nhiều ngày nhất lên đầu
 
+    // 1. Tải dữ liệu từ Server
     async function loadData() {
         try {
-            const r = await fetch(API);
-            rawData = await r.json();
+            const response = await fetch(API_URL);
+            database = await response.json();
             
-            // LOGIC QUAN TRỌNG: Sắp xếp theo ngày hết hạn giảm dần (Nhiều ngày nhất lên đầu)
-            // Điều này cũng đảm bảo khi bạn thêm mới, nếu ngày hết hạn xa thì nó sẽ ở trên cùng.
-            applyCurrentSort();
-            
-            filterData();
-            updateNotif();
-        } catch (e) { alert("Lỗi kết nối Server!"); }
+            // Tự động sắp xếp bảo hiểm mới nhất/hạn lâu nhất lên đầu khi tải xong
+            applySorting();
+            filterTable();
+            checkNotifications();
+        } catch (error) {
+            console.error("Lỗi tải dữ liệu:", error);
+        }
     }
 
-    function getInfo(d) {
+    // 2. Tính toán trạng thái bảo hiểm
+    function getStatus(dateStr) {
+        if (!dateStr) return { text: "N/A", class: "", key: "" };
         const today = new Date(); today.setHours(0,0,0,0);
-        const exp = new Date(d);
-        const diff = Math.ceil((exp - today) / (86400000));
-        if (diff < 0) return { t: "HẾT HẠN", c: "het-han", k: "HET_HAN" };
-        if (diff <= 30) return { t: `SẮP HẾT (${diff}n)`, c: "sap-het", k: "SAP_HET" };
-        return { t: `CÒN HẠN (${diff}n)`, c: "con-han", k: "CON_HAN" };
+        const expDate = new Date(dateStr);
+        const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) return { text: "HẾT HẠN", class: "st-hethan", key: "HET_HAN" };
+        if (diffDays <= 30) return { text: `SẮP HẾT (${diffDays}n)`, class: "st-saphet", key: "SAP_HET" };
+        return { text: `CÒN HẠN (${diffDays}n)`, class: "st-conhan", key: "CON_HAN" };
     }
 
-    function applyCurrentSort() {
-        rawData.sort((a, b) => {
-            const dA = new Date(a.ngayhethan);
-            const dB = new Date(b.ngayhethan);
-            return sortMode === 'DESC' ? dB - dA : dA - dB;
-        });
-    }
-
-    function sortDataByExpiry() {
-        sortMode = (sortMode === 'DESC') ? 'ASC' : 'DESC';
-        document.getElementById('sortDir').innerText = sortMode === 'DESC' ? '↓' : '↑';
-        applyCurrentSort();
-        filterData();
-    }
-
-    function filterData(close = false) {
-        const key = document.getElementById('searchInput').value.toLowerCase();
-        const checks = Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value);
+    // 3. Logic Lọc và Tìm kiếm
+    function filterTable(shouldCloseMenu = false) {
+        const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+        const activeFilters = Array.from(document.querySelectorAll('.status-chk:checked')).map(cb => cb.value);
         
-        const filtered = rawData.filter(i => {
-            const st = getInfo(i.ngayhethan);
-            const mS = (i.tenkhach||"").toLowerCase().includes(key) || (i.bienso||"").toLowerCase().includes(key);
-            const mC = checks.includes(st.k);
-            return mS && mC;
+        const filteredData = database.filter(item => {
+            const status = getStatus(item.ngayhethan);
+            const searchMatch = (item.tenkhach || "").toLowerCase().includes(searchKeyword) || 
+                                (item.bienso || "").toLowerCase().includes(searchKeyword) || 
+                                (item.diachi || "").toLowerCase().includes(searchKeyword) || 
+                                (item.note || "").toLowerCase().includes(searchKeyword);
+            const filterMatch = activeFilters.includes(status.key);
+            return searchMatch && filterMatch;
         });
 
-        const tb = document.getElementById('tableBody');
-        tb.innerHTML = '';
-        filtered.forEach((item, idx) => {
-            const s = getInfo(item.ngayhethan);
-            tb.innerHTML += `
+        renderTable(filteredData);
+        if(shouldCloseMenu) document.getElementById('filterMenu').classList.remove('show');
+    }
+
+    // 4. Đổ dữ liệu ra bảng
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        
+        data.forEach((item, index) => {
+            const st = getStatus(item.ngayhethan);
+            tbody.innerHTML += `
                 <tr>
-                    <td>${idx + 1}</td>
-                    <td><b>${item.tenkhach}</b></td>
+                    <td>${index + 1}</td>
+                    <td><b>${item.tenkhach || ''}</b></td>
+                    <td>${item.diachi || '-'}</td>
                     <td>${item.sdt || ''}</td>
                     <td>${item.ngaycap ? new Date(item.ngaycap).toLocaleDateString('vi-VN') : ''}</td>
-                    <td><b>${new Date(item.ngayhethan).toLocaleDateString('vi-VN')}</b></td>
+                    <td><b>${item.ngayhethan ? new Date(item.ngayhethan).toLocaleDateString('vi-VN') : ''}</b></td>
                     <td>${item.hangbh || ''}</td>
                     <td>${item.loaixe || ''}</td>
-                    <td style="text-transform:uppercase;">${item.bienso}</td>
-                    <td style="color:#666; font-size:12px;">${item.note || ''}</td>
-                    <td><span class="status ${s.c}">${s.t}</span></td>
+                    <td style="text-transform:uppercase;">${item.bienso || ''}</td>
+                    <td style="color:#777; font-size:12px;">${item.note || ''}</td>
+                    <td><span class="badge ${st.class}">${st.text}</span></td>
                     <td>
-                        <button class="action-btn edit-btn" onclick="openEdit(${item.id})">Sửa</button>
-                        <button class="action-btn delete-btn" style="background:#ff4d4f; color:white;" onclick="deleteItem(${item.id})">Xóa</button>
+                        <button class="btn-edit" onclick="openEditModal(${item.id})">Sửa</button>
+                        <button class="btn-delete" onclick="deleteItem(${item.id})">Xóa</button>
                     </td>
-                </tr>`;
+                </tr>
+            `;
         });
-        if(close) document.getElementById('filterMenu').classList.remove('show');
     }
 
-    // Modal logic
-    function openEdit(id) {
-        const item = rawData.find(x => x.id === id);
-        document.getElementById('modalTitle').innerText = "✏️ Chỉnh sửa bảo hiểm";
-        document.getElementById('fId').value = item.id;
-        document.getElementById('fTen').value = item.tenkhach;
-        document.getElementById('fSdt').value = item.sdt;
-        document.getElementById('fCap').value = item.ngaycap ? item.ngaycap.split('T')[0] : '';
-        document.getElementById('fHet').value = item.ngayhethan ? item.ngayhethan.split('T')[0] : '';
-        document.getElementById('fHang').value = item.hangbh;
-        document.getElementById('fLoai').value = item.loaixe;
-        document.getElementById('fBien').value = item.bienso;
-        document.getElementById('fNote').value = item.note;
+    // 5. Logic Sắp xếp
+    function toggleSort() {
+        isDescOrder = !isDescOrder;
+        document.getElementById('sortIcon').innerText = isDescOrder ? '↓' : '↑';
+        applySorting();
+        filterTable();
+    }
+
+    function applySorting() {
+        database.sort((a, b) => {
+            const dateA = new Date(a.ngayhethan);
+            const dateB = new Date(b.ngayhethan);
+            return isDescOrder ? dateB - dateA : dateA - dateB;
+        });
+    }
+
+    // 6. Xử lý Thêm/Sửa/Xóa
+    function openAddModal() {
+        document.getElementById('modalTitle').innerText = "➕ Thêm bảo hiểm mới";
+        document.getElementById('fieldId').value = "";
+        clearModalInputs();
         document.getElementById('dataModal').style.display = 'flex';
     }
 
-    async function saveAction() {
-        const id = document.getElementById('fId').value;
-        const data = {
-            tenkhach: document.getElementById('fTen').value,
-            sdt: document.getElementById('fSdt').value,
-            ngaycap: document.getElementById('fCap').value,
-            ngayhethan: document.getElementById('fHet').value,
-            hangbh: document.getElementById('fHang').value,
-            loaixe: document.getElementById('fLoai').value,
-            bienso: document.getElementById('fBien').value.toUpperCase(),
-            note: document.getElementById('fNote').value
-        };
-        
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? `${API}/${id}` : API;
+    function openEditModal(id) {
+        const item = database.find(x => x.id === id);
+        if(!item) return;
+        document.getElementById('modalTitle').innerText = "✏️ Chỉnh sửa bảo hiểm";
+        document.getElementById('fieldId').value = item.id;
+        document.getElementById('fieldTen').value = item.tenkhach;
+        document.getElementById('fieldDiaChi').value = item.diachi || "";
+        document.getElementById('fieldSdt').value = item.sdt;
+        document.getElementById('fieldCap').value = item.ngaycap ? item.ngaycap.split('T')[0] : '';
+        document.getElementById('fieldHet').value = item.ngayhethan ? item.ngayhethan.split('T')[0] : '';
+        document.getElementById('fieldHang').value = item.hangbh;
+        document.getElementById('fieldLoai').value = item.loaixe;
+        document.getElementById('fieldBien').value = item.bienso;
+        document.getElementById('fieldNote').value = item.note;
+        document.getElementById('dataModal').style.display = 'flex';
+    }
 
-        await fetch(url, {
+    async function handleSave() {
+        const id = document.getElementById('fieldId').value;
+        const payload = {
+            tenkhach: document.getElementById('fieldTen').value,
+            diachi: document.getElementById('fieldDiaChi').value,
+            sdt: document.getElementById('fieldSdt').value,
+            ngaycap: document.getElementById('fieldCap').value,
+            ngayhethan: document.getElementById('fieldHet').value,
+            hangbh: document.getElementById('fieldHang').value,
+            loaixe: document.getElementById('fieldLoai').value,
+            bienso: document.getElementById('fieldBien').value.toUpperCase(),
+            note: document.getElementById('fieldNote').value
+        };
+
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${API_URL}/${id}` : API_URL;
+
+        const res = await fetch(url, {
             method: method,
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
         });
-        closeModal();
-        loadData();
+
+        if(res.ok) { closeModal(); loadData(); }
     }
 
-    function toggleFilter(e) { e.stopPropagation(); document.getElementById('filterMenu').classList.toggle('show'); }
-    function toggleCheckbox(id) { const c = document.getElementById(id); c.checked = !c.checked; }
-    function checkAll(v) { document.querySelectorAll('.st-cb').forEach(c => c.checked = v); filterData(true); }
+    async function deleteItem(id) {
+        if(confirm("Bạn có chắc chắn muốn xóa dòng này?")) {
+            await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            loadData();
+        }
+    }
+
+    // 7. Tiện ích giao diện
+    function toggleFilterMenu(e) {
+        e.stopPropagation();
+        document.getElementById('filterMenu').classList.toggle('show');
+    }
+
+    function setAllFilters(val) {
+        document.querySelectorAll('.status-chk').forEach(cb => cb.checked = val);
+        filterTable(true);
+    }
+
+    function checkNotifications() {
+        const expiringCount = database.filter(i => getStatus(i.ngayhethan).key === "SAP_HET").length;
+        if(expiringCount > 0) {
+            document.getElementById('notifBar').style.display = 'flex';
+            document.getElementById('notifCount').innerText = expiringCount;
+        } else {
+            document.getElementById('notifBar').style.display = 'none';
+        }
+    }
+
+    function clearModalInputs() {
+        document.querySelectorAll('.modal-body input, .modal-body textarea').forEach(i => i.value = "");
+    }
+
     function closeModal() { document.getElementById('dataModal').style.display = 'none'; }
-    function deleteItem(id) { if(confirm("Xóa dòng này?")) fetch(`${API}/${id}`, {method:'DELETE'}).then(()=>loadData()); }
-    
-    function updateNotif() {
-        const c = rawData.filter(i => getInfo(i.ngayhethan).k === "SAP_HET").length;
-        if(c > 0) { document.getElementById('notif').style.display = 'flex'; document.getElementById('notifCount').innerText = c; }
+
+    // Đóng filter khi bấm ra ngoài
+    window.onclick = function() {
+        document.getElementById('filterMenu').classList.remove('show');
     }
 
-    window.onclick = () => document.getElementById('filterMenu').classList.remove('show');
     window.onload = loadData;
 </script>
 </body>
