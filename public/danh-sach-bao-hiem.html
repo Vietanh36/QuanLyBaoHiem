@@ -197,6 +197,7 @@
     </div>
 
        <!-- ==================== MODAL SỬA ==================== -->
+        <!-- ==================== MODAL SỬA THÔNG TIN ==================== -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
@@ -235,9 +236,16 @@
                 <textarea id="editNote" rows="3"></textarea>
             </div>
 
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-                <button class="btn-save" onclick="saveBaoHiem()">Lưu thay đổi</button>
+            <!-- NÚT HỦY & LƯU - ĐẶT Ở ĐÂY -->
+            <div style="text-align: right; margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee;">
+                <button onclick="closeModal()" 
+                        style="padding: 10px 20px; margin-right: 10px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Hủy
+                </button>
+                <button onclick="saveBaoHiem()" 
+                        style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    💾 Lưu thay đổi
+                </button>
             </div>
         </div>
     </div>
@@ -354,6 +362,42 @@
                 alert("❌ Không kết nối được với server");
             }
         }
+        function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+async function saveBaoHiem() {
+    const id = document.getElementById('editId').value;
+    const data = {
+        tenkhach: document.getElementById('editTenKhach').value.trim(),
+        sdt: document.getElementById('editSdt').value.trim(),
+        ngaycap: document.getElementById('editNgayCap').value,
+        ngayhethan: document.getElementById('editNgayHetHan').value,
+        hangbh: document.getElementById('editHangBH').value.trim(),
+        loaixe: document.getElementById('editLoaiXe').value.trim(),
+        bienso: document.getElementById('editBienSo').value.trim().toUpperCase(),
+        note: document.getElementById('editNote').value.trim()
+    };
+
+    try {
+        const url = id ? `${API_URL}/${id}` : API_URL;
+        const res = await fetch(url, {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            alert("✅ Lưu thành công!");
+            closeModal();
+            loadData();
+        } else {
+            alert("❌ Lưu thất bại!");
+        }
+    } catch (err) {
+        alert("❌ Không kết nối được với server");
+    }
+}
 
         async function deleteBaoHiem(id) {
             if (!confirm("Xóa thật không?")) return;
