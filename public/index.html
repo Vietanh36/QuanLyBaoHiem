@@ -39,14 +39,26 @@
         .btn-view:hover { background: #0056b3; }
         .button-group { text-align: center; margin-top: 30px; }
         .error { color: red; font-size: 14px; margin-top: 5px; }
+        .header-info {
+            text-align: right;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="header-info">
+            <strong id="userDisplay"></strong> | 
+            <a href="#" onclick="logout()" style="color: red; text-decoration: none;">Đăng xuất</a>
+        </div>
+
         <h1>Quản Lý Bảo Hiểm Ô Tô</h1>
         <p class="subtitle">Bảo hiểm xe hơi - Thời hạn 1 năm</p>
        
         <div class="form-grid">
+            <!-- Các trường form giữ nguyên như cũ -->
             <div class="form-group">
                 <label class="required">Tên khách hàng</label>
                 <input type="text" id="tenKhach" placeholder="Nguyễn Văn A">
@@ -91,7 +103,7 @@
         </div>
 
         <div class="button-group">
-            <button onclick="themBaoHiem()" class="btn">✅ Thêm Bảo Hiểm</button>
+            <button onclick="themBaoHiem()" class="btn" id="btnAdd">✅ Thêm Bảo Hiểm</button>
             <a href="danh-sach-bao-hiem.html" 
                class="btn btn-view" 
                style="text-decoration:none; display:inline-block;"
@@ -102,6 +114,32 @@
     </div>
 
     <script>
+        // ==================== KIỂM TRA ĐĂNG NHẬP ====================
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            alert("⛔ Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
+            window.location.href = "login.html";
+        }
+
+        const currentRole = localStorage.getItem('role');
+        const username = localStorage.getItem('username') || "Người dùng";
+
+        // Hiển thị tên người dùng
+        document.getElementById('userDisplay').innerHTML = 
+            `Xin chào <strong>${username}</strong> (${currentRole === 'admin' ? 'Quản trị viên' : 'Nhân viên'})`;
+
+        // Ẩn nút Thêm nếu là Nhân viên
+        if (currentRole === 'user') {
+            document.getElementById('btnAdd').style.display = 'none';
+        }
+
+        function logout() {
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+                localStorage.clear();
+                window.location.href = "login.html";
+            }
+        }
+
+        // Các hàm còn lại giữ nguyên như trước (autoTinhNgayHetHan, validateForm, checkTrungBienSo, themBaoHiem...)
         function autoTinhNgayHetHan() {
             const ngayCap = document.getElementById('ngayCap').value;
             const ngayHetHan = document.getElementById('ngayHetHan');
@@ -144,43 +182,42 @@
             return danhSach.some(item => item.bienSo && item.bienSo.toUpperCase() === bienSoMoi.toUpperCase());
         }
 
-        async function themBaoHiem() {
-    if (!validateForm()) return;
+        function themBaoHiem() {
+            if (currentRole !== 'admin') {
+                alert("⛔ Bạn không có quyền thêm bảo hiểm!");
+                return;
+            }
+            if (!validateForm()) return;
 
-    const data = {
-        tenKhach: document.getElementById('tenKhach').value.trim(),
-        sdt: document.getElementById('sdt').value.trim(),
-        diaChi: document.getElementById('diaChi').value.trim(),
-        ngayCap: document.getElementById('ngayCap').value,
-        ngayHetHan: document.getElementById('ngayHetHan').value,
-        hangBH: document.getElementById('hangBaoHiem').value.trim(),
-        loaiXe: document.getElementById('loaiXe').value.trim(),
-        bienSo: document.getElementById('bienSo').value.trim().toUpperCase(),
-        soKhung: document.getElementById('soKhung').value.trim(),
-        note: ""
-    };
+            const bienSo = document.getElementById('bienSo').value.trim().toUpperCase();
 
-    try {
-        const res = await fetch('/api/baohiem', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
+            if (checkTrungBienSo(bienSo)) {
+                document.getElementById('error-bienSo').textContent = "❌ Biển số xe này đã tồn tại!";
+                alert("❌ Không thể thêm! Biển số xe này đã được đăng ký trước đó.");
+                return;
+            }
 
-        if (res.ok) {
-            alert("✅ Thêm thành công!");
-            document.querySelectorAll('input').forEach(i => i.value = '');
-        } else {
-            alert("❌ Lỗi thêm dữ liệu!");
+            const baoHiemMoi = {
+                id: Date.now(),
+                tenKhach: document.getElementById('tenKhach').value.trim(),
+                sdt: document.getElementById('sdt').value.trim(),
+                diaChi: document.getElementById('diaChi').value.trim() || "Chưa cập nhật",
+                ngayCap: document.getElementById('ngayCap').value,
+                ngayHetHan: document.getElementById('ngayHetHan').value,
+                hangBH: document.getElementById('hangBaoHiem').value.trim(),
+                loaiXe: document.getElementById('loaiXe').value.trim() || "Chưa cập nhật",
+                bienSo: bienSo,
+                soKhung: document.getElementById('soKhung').value.trim() || "Chưa có",
+                note: ""
+            };
+
+            let danhSach = JSON.parse(localStorage.getItem('danhSachBaoHiem')) || [];
+            danhSach.unshift(baoHiemMoi);
+            localStorage.setItem('danhSachBaoHiem', JSON.stringify(danhSach));
+
+            alert("✅ Đã thêm bảo hiểm thành công!");
+            document.querySelectorAll('input').forEach(input => input.value = '');
         }
-
-    } catch (err) {
-        console.error(err);
-        alert("❌ Không kết nối được server!");
-    }
-}
     </script>
 </body>
 </html>

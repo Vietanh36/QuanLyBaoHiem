@@ -20,7 +20,7 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: visible;
+            overflow: hidden;
         }
         header {
             background: linear-gradient(90deg, #007bff, #0056b3);
@@ -58,6 +58,8 @@
         }
         .btn-home { background: #28a745; }
         .btn-add { background: #007bff; }
+        .btn-register { background: #6f42c1; }
+        .btn-logout { background: #dc3545; }
 
         .notification-bar {
             background: #d32f2f;
@@ -126,7 +128,6 @@
             font-size: 14px;
         }
         .edit-btn { background: #ffc107; color: #212529; }
-
         .delete-btn { background: #dc3545; color: white; }
 
         .filter-btn {
@@ -156,68 +157,35 @@
         }
 
         .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 2000;
-
-    justify-content: center;
-    align-items: center;
-
-    padding: 20px;          /* thêm */
-    box-sizing: border-box; /* thêm */
-}
-
-.modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 520px;
-    max-height: 90vh;       /* thêm */
-    overflow-y: auto;       /* thêm */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.modal h2 {
-    margin-top: 0;
-    color: #007bff;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-.search-wrapper {
-    position: sticky;
-    top: 20px;
-    z-index: 1000;
-    background: white;
-    padding: 10px 0;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-    box-sizing: border-box; /* thêm để không bị tràn */
-}
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h2 { margin-top: 0; color: #007bff; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
         .form-group textarea { height: 80px; resize: vertical; }
         .modal-buttons {
             display: flex;
@@ -241,6 +209,8 @@
             <div class="nav-buttons">
                 <button onclick="switchToHome()" class="nav-btn btn-home">🏠 Trang Chủ</button>
                 <button onclick="switchToAdd()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
+                <button onclick="showRegisterModal()" class="nav-btn btn-register" id="btnRegister">Đăng ký tài khoản</button>
+                <button onclick="logout()" class="nav-btn btn-logout">Đăng xuất</button>
             </div>
         </header>
 
@@ -251,21 +221,20 @@
                 <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
             </div>
 
-           <div class="search-wrapper">
-    <input type="text" id="searchInput" class="search-box"
-        placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng bảo hiểm, note..."
-        onkeyup="searchTable()">
-
-    <button onclick="refreshTable()"
-        style="padding: 10px 22px; background:#17a2b8; color:white;">
-        🔄 Cập nhật trạng thái
-    </button>
-
-    <button onclick="loadData()"
-        style="padding: 10px 22px; background:#6c757d; color:white;">
-        🔁 Tải lại dữ liệu
-    </button>
-</div>
+            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="searchInput" class="search-box" style="flex: 1;"
+                       placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng bảo hiểm, note..."
+                       onkeyup="searchTable()">
+                
+                <button onclick="refreshTable()" 
+                        style="padding: 10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer;">
+                    🔄 Cập nhật trạng thái
+                </button>
+                <button onclick="loadData()" 
+                        style="padding: 10px 22px; background:#6c757d; color:white; border:none; border-radius:8px; cursor:pointer;">
+                    🔁 Tải lại dữ liệu
+                </button>
+            </div>
 
             <div style="overflow-x:auto;">
                 <table id="insuranceTable">
@@ -296,7 +265,7 @@
         </div>
     </div>
 
-    <!-- Popup Sửa -->
+    <!-- Popup Sửa Bảo Hiểm -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
@@ -340,10 +309,51 @@
         </div>
     </div>
 
+    <!-- Popup Đăng ký tài khoản -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h2>📝 Đăng ký tài khoản mới</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="example@email.com">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="regPassword" placeholder="Mật khẩu">
+            </div>
+            <div class="form-group">
+                <label>Vai trò</label>
+                <select id="regRole">
+                    <option value="user">Nhân viên</option>
+                    <option value="admin">Quản trị viên</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeRegisterModal()">Hủy</button>
+                <button class="btn-save" onclick="registerAccount()">Đăng ký</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let danhSachBaoHiem = [];
         let trangThaiFilter = "ALL";
         let sapXepTheoNgay = null;
+
+        // ==================== KIỂM TRA ĐĂNG NHẬP ====================
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            alert("⛔ Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
+            window.location.href = "login.html";
+        }
+
+        const currentRole = localStorage.getItem('role');
+        const currentUsername = localStorage.getItem('username') || "Người dùng";
+
+        // Ẩn nút Đăng ký nếu không phải Admin
+        if (currentRole !== 'admin') {
+            const regBtn = document.getElementById('btnRegister');
+            if (regBtn) regBtn.style.display = 'none';
+        }
 
         function getTrangThai(ngayHetHan) {
             const today = new Date();
@@ -357,52 +367,16 @@
             return { text: `CÒN HẠN (${diffDays} ngày)`, class: "con-han" };
         }
 
-        async function loadData() {
-            try {
-                console.log("🔄 Đang tải dữ liệu từ server...");
-                const res = await fetch('/api/baohiem', {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" }
-                });
-
-                console.log("📡 Status:", res.status, res.statusText);
-
-                if (!res.ok) {
-                    throw new Error(`Lỗi server: ${res.status} ${res.statusText}`);
-                }
-
-                const data = await res.json();
-                console.log("✅ Nhận được dữ liệu:", data.length, "bản ghi");
-
-                danhSachBaoHiem = data;
-                renderTable();
-                checkThongBaoDo();
-
-            } catch (err) {
-                console.error("❌ Lỗi loadData:", err);
-                alert("❌ Không lấy được dữ liệu từ server!\n\n" +
-                      "Kiểm tra:\n" +
-                      "1. Server Node.js có đang chạy ở port 3000 không?\n" +
-                      "2. Đã thêm CORS chưa?\n" +
-                      "3. Mở F12 → Console để xem lỗi chi tiết.");
-            }
+        function loadData() {
+            danhSachBaoHiem = JSON.parse(localStorage.getItem('danhSachBaoHiem')) || [];
+            renderTable();
         }
-        // Load lần đầu khi mở trang
-loadData();
-
-// 👉 Tự reload khi quay lại tab
-window.addEventListener("focus", function () {
-    console.log("🔄 Quay lại tab → reload data");
-    loadData();
-});
 
         function renderTable(filteredList = null) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
             let listToRender = filteredList || danhSachBaoHiem;
-            // ✅ Sắp xếp mới → cũ (theo id)
-            listToRender.sort((a, b) => b.id - a.id);
 
             if (trangThaiFilter !== "ALL") {
                 listToRender = listToRender.filter(item => {
@@ -446,6 +420,8 @@ window.addEventListener("focus", function () {
                 `;
                 tbody.appendChild(row);
             });
+
+            checkThongBaoDo();
         }
 
         function formatDate(dateStr) {
@@ -468,6 +444,7 @@ window.addEventListener("focus", function () {
                 const newNote = input.value.trim();
                 const item = danhSachBaoHiem.find(x => x.id === id);
                 if (item) item.note = newNote;
+                localStorage.setItem('danhSachBaoHiem', JSON.stringify(danhSachBaoHiem));
                 renderTable();
             }
 
@@ -481,9 +458,12 @@ window.addEventListener("focus", function () {
         }
 
         function editBaoHiem(id) {
+            if (currentRole !== 'admin') {
+                alert("⛔ Bạn không có quyền sửa dữ liệu!");
+                return;
+            }
             const item = danhSachBaoHiem.find(x => x.id === id);
             if (!item) return;
-
             document.getElementById('editId').value = item.id;
             document.getElementById('editTenKhach').value = item.tenKhach || '';
             document.getElementById('editSdt').value = item.sdt || '';
@@ -493,7 +473,6 @@ window.addEventListener("focus", function () {
             document.getElementById('editLoaiXe').value = item.loaiXe || '';
             document.getElementById('editBienSo').value = item.bienSo || '';
             document.getElementById('editNote').value = item.note || '';
-
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -502,6 +481,10 @@ window.addEventListener("focus", function () {
         }
 
         function saveEdit() {
+            if (currentRole !== 'admin') {
+                alert("⛔ Bạn không có quyền sửa dữ liệu!");
+                return;
+            }
             const id = parseInt(document.getElementById('editId').value);
             const item = danhSachBaoHiem.find(x => x.id === id);
             if (!item) return;
@@ -515,29 +498,85 @@ window.addEventListener("focus", function () {
             item.bienSo = document.getElementById('editBienSo').value.trim().toUpperCase();
             item.note = document.getElementById('editNote').value.trim();
 
+            localStorage.setItem('danhSachBaoHiem', JSON.stringify(danhSachBaoHiem));
             closeModal();
             renderTable();
             alert("✅ Đã lưu thay đổi thành công!");
         }
 
-        async function xoaBaoHiem(id) {
-            if (!confirm("Bạn có chắc chắn muốn xóa bảo hiểm này không?")) return;
-
-            try {
-                const res = await fetch(`/api/baohiem/${id}`, {
-                    method: "DELETE"
-                });
-
-                if (res.ok) {
-                    alert("✅ Đã xóa thành công!");
-                    loadData();
-                } else {
-                    alert("❌ Xóa thất bại!");
-                }
-            } catch (err) {
-                console.error(err);
-                alert("❌ Lỗi kết nối khi xóa");
+        function xoaBaoHiem(id) {
+            if (currentRole !== 'admin') {
+                alert("⛔ Bạn không có quyền xóa dữ liệu!");
+                return;
             }
+            if (confirm("Bạn có chắc chắn muốn xóa bảo hiểm này không?")) {
+                danhSachBaoHiem = danhSachBaoHiem.filter(item => item.id !== id);
+                localStorage.setItem('danhSachBaoHiem', JSON.stringify(danhSachBaoHiem));
+                renderTable();
+            }
+        }
+
+        // ==================== QUẢN LÝ TÀI KHOẢN ====================
+        function showRegisterModal() {
+            if (currentRole !== 'admin') {
+                alert("⛔ Chỉ Admin Tổng mới được đăng ký tài khoản!");
+                return;
+            }
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').style.display = 'none';
+        }
+
+        function registerAccount() {
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value.trim();
+            const role = document.getElementById('regRole').value;
+
+            if (!email || !password) {
+                alert("Vui lòng nhập đầy đủ email và mật khẩu!");
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            if (users.some(u => u.email === email)) {
+                alert("Email này đã tồn tại!");
+                return;
+            }
+
+            users.push({
+                email: email,
+                password: password,
+                role: role,
+                username: email.split('@')[0]
+            });
+
+            localStorage.setItem('users', JSON.stringify(users));
+            alert(`✅ Đăng ký thành công!\nEmail: ${email}\nVai trò: ${role}`);
+            closeRegisterModal();
+        }
+
+        function logout() {
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+                localStorage.clear();
+                window.location.href = "login.html";
+            }
+        }
+
+        function switchToHome() {
+            const homeWindow = window.open("trangchu.html", "trangchu");
+            if (homeWindow) homeWindow.focus();
+        }
+
+        function switchToAdd() {
+            const homeWindow = window.open("trangchu.html", "trangchu");
+            if (homeWindow) homeWindow.focus();
+        }
+
+        function refreshTable() {
+            renderTable();
+            alert("✅ Trạng thái đã được cập nhật theo ngày hiện tại!");
         }
 
         function toggleFilter() {
@@ -556,8 +595,8 @@ window.addEventListener("focus", function () {
                 <div style="padding: 10px 16px; font-weight: 600; color: #007bff;">Lọc theo trạng thái</div>
                 <div onclick="applyFilter('ALL')" style="padding:12px 20px; cursor:pointer;">📋 Tất cả</div>
                 <div style="border-top:1px solid #eee; margin:5px 0;"></div>
-                <div onclick="applySort('desc')" style="padding:12px 20px; cursor:pointer;">🔽 Còn hạn nhiều ngày nhất</div>
-                <div onclick="applySort('asc')" style="padding:12px 20px; cursor:pointer;">🔼 Còn hạn ít ngày nhất</div>
+                <div onclick="applySort('desc')" style="padding:12px 20px; cursor:pointer;">🔽 Còn hạn: Nhiều ngày nhất</div>
+                <div onclick="applySort('asc')" style="padding:12px 20px; cursor:pointer;">🔼 Còn hạn: Ít ngày nhất</div>
                 <div style="border-top:1px solid #eee; margin:5px 0;"></div>
                 <div onclick="applyFilter('CON_HAN')" style="padding:12px 20px; cursor:pointer;">🟢 Còn hạn</div>
                 <div onclick="applyFilter('SAP_HET')" style="padding:12px 20px; cursor:pointer;">🟡 Sắp hết hạn</div>
@@ -567,13 +606,12 @@ window.addEventListener("focus", function () {
             document.body.appendChild(menu);
 
             setTimeout(() => {
-                const closeMenu = (e) => {
+                document.addEventListener('click', function closeMenu(e) {
                     if (!menu.contains(e.target)) {
                         menu.remove();
                         document.removeEventListener('click', closeMenu);
                     }
-                };
-                document.addEventListener('click', closeMenu);
+                });
             }, 10);
         }
 
@@ -642,22 +680,6 @@ window.addEventListener("focus", function () {
             alert("✅ Đã xuất file Excel thành công!");
         }
 
-        function switchToHome() {
-            const homeWindow = window.open("index.html", "trangchu");
-            if (homeWindow) homeWindow.focus();
-        }
-
-        function switchToAdd() {
-            const homeWindow = window.open("index.html", "trangchu");
-            if (homeWindow) homeWindow.focus();
-        }
-
-        function refreshTable() {
-            renderTable();
-            alert("✅ Trạng thái đã được cập nhật theo ngày hiện tại!");
-        }
-
-        // Tự động tải dữ liệu khi mở trang
         window.onload = loadData;
     </script>
 </body>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập - Quản Lý Bảo Hiểm</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .login-box {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 420px;
+        }
+        h2 { text-align: center; color: #007bff; margin-bottom: 30px; }
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover { background: #218838; }
+        .error { color: red; text-align: center; margin: 15px 0; }
+        .demo {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>🔐 Đăng Nhập Hệ Thống</h2>
+        
+        <input type="email" id="email" placeholder="Email đăng nhập" value="cvdv@admin.com">
+        <input type="password" id="password" placeholder="Mật khẩu" value="123456">
+
+        <button onclick="login()">Đăng Nhập</button>
+        <div id="error" class="error"></div>
+
+        <div class="demo">
+            <strong>Tài khoản demo:</strong><br>
+            Quản trị viên (Admin): <code>cvdv@admin.com</code> / 123456<br>
+            Nhân viên: <code>kddv@nv.com</code> / 123456
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value.trim();
+            const errorEl = document.getElementById('error');
+
+            let role = null;
+            let username = "";
+
+            if (email === "cvdv@admin.com" && password === "123456") {
+                role = "admin";
+                username = "Quản trị viên";
+            } else if (email === "kddv@nv.com" && password === "123456") {
+                role = "user";
+                username = "Nhân viên Kinh Doanh";
+            } else {
+                errorEl.textContent = "❌ Sai email hoặc mật khẩu!";
+                return;
+            }
+
+            // Lưu thông tin đăng nhập
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('role', role);
+            localStorage.setItem('username', username);
+            localStorage.setItem('email', email);
+
+            alert(`✅ Đăng nhập thành công!\nVai trò: ${role === 'admin' ? 'Quản trị viên' : 'Nhân viên'}`);
+            window.location.href = "trangchu.html";
+        }
+
+        // Nếu đã đăng nhập thì chuyển thẳng
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = "trangchu.html";
+        }
+    </script>
+</body>
+</html>

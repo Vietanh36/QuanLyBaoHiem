@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Tài Khoản - Admin Tổng</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+      
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .main { padding: 30px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-edit { background: #ffc107; color: #212529; }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-back { background: #6c757d; color: white; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .header-info {
+            text-align: right;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">👤 Quản Lý Tài Khoản</div>
+            <div class="header-right">
+                <span>Xin chào <strong>Admin Tổng</strong></span>
+                <button onclick="window.location.href='danh-sach-bao-hiem.html'" class="btn btn-back">Quay lại Danh Sách</button>
+                <button onclick="logout()" class="btn btn-delete">Đăng xuất</button>
+            </div>
+        </header>
+
+        <div class="main">
+            <h2>Danh sách tài khoản hệ thống</h2>
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Email</th>
+                        <th>Vai trò</th>
+                        <th>Ngày tạo</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="userBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Popup thay đổi mật khẩu -->
+    <div id="changePassModal" class="modal">
+        <div class="modal-content">
+            <h2>🔑 Thay đổi mật khẩu</h2>
+            <input type="hidden" id="changeEmail">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="displayEmail" readonly>
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu mới</label>
+                <input type="password" id="newPassword">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-back" onclick="closeChangePassModal()">Hủy</button>
+                <button class="btn btn-save" onclick="saveNewPassword()">Lưu mật khẩu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Kiểm tra quyền Admin Tổng
+        if (localStorage.getItem('isLoggedIn') !== 'true' || localStorage.getItem('role') !== 'admin') {
+            alert("⛔ Chỉ Admin Tổng mới được truy cập trang này!");
+            window.location.href = "login.html";
+        }
+
+        function loadUsers() {
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            const tbody = document.getElementById('userBody');
+            tbody.innerHTML = '';
+
+            users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${user.email}</td>
+                    <td><strong>${user.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'}</strong></td>
+                    <td>${new Date().toLocaleDateString('vi-VN')}</td>
+                    <td>
+                        <button onclick="changePassword('${user.email}')" class="btn btn-edit">Đổi mật khẩu</button>
+                        <button onclick="deleteUser('${user.email}')" class="btn btn-delete">Xóa</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function changePassword(email) {
+            document.getElementById('changeEmail').value = email;
+            document.getElementById('displayEmail').value = email;
+            document.getElementById('changePassModal').style.display = 'flex';
+        }
+
+        function closeChangePassModal() {
+            document.getElementById('changePassModal').style.display = 'none';
+        }
+
+        function saveNewPassword() {
+            const email = document.getElementById('changeEmail').value;
+            const newPass = document.getElementById('newPassword').value.trim();
+
+            if (!newPass) {
+                alert("Vui lòng nhập mật khẩu mới!");
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.email === email);
+            if (user) {
+                user.password = newPass;
+                localStorage.setItem('users', JSON.stringify(users));
+                alert(`✅ Đã thay đổi mật khẩu cho ${email}`);
+                closeChangePassModal();
+            }
+        }
+
+        function deleteUser(email) {
+            if (!confirm(`Bạn có chắc muốn xóa tài khoản ${email}?`)) return;
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users = users.filter(u => u.email !== email);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert(`✅ Đã xóa tài khoản ${email}`);
+            loadUsers();
+        }
+
+        function logout() {
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+                localStorage.clear();
+                window.location.href = "login.html";
+            }
+        }
+
+        // Tải dữ liệu khi mở trang
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>
