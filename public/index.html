@@ -28,13 +28,13 @@
         .form-group { display: flex; flex-direction: column; }
         label { font-weight: 500; margin-bottom: 8px; color: #333; }
         .required::after { content: " *"; color: red; }
-        input { padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
-        input:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.2); }
+        input, textarea { padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        input:focus, textarea:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.2); }
         .btn {
             background: #28a745; color: white; border: none; padding: 14px 30px;
             border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; margin: 10px 5px;
         }
-        .btn:hover { background: #218838; transform: translateY(-2px); }
+        .btn:hover { background: #218838; }
         .btn-view { background: #007bff; }
         .btn-view:hover { background: #0056b3; }
         .button-group { text-align: center; margin-top: 30px; }
@@ -55,10 +55,9 @@
         </div>
 
         <h1>Quản Lý Bảo Hiểm Ô Tô</h1>
-        <p class="subtitle">Bảo hiểm xe hơi - Thời hạn 1 năm</p>
+        <p class="subtitle">Thêm bảo hiểm xe hơi - Thời hạn 1 năm</p>
        
         <div class="form-grid">
-            <!-- Các trường form giữ nguyên như cũ -->
             <div class="form-group">
                 <label class="required">Tên khách hàng</label>
                 <input type="text" id="tenKhach" placeholder="Nguyễn Văn A">
@@ -84,7 +83,7 @@
             </div>
             <div class="form-group">
                 <label class="required">Hãng bảo hiểm</label>
-                <input type="text" id="hangBaoHiem" placeholder="Ví dụ: Bảo Việt, PTI, Liberty, MIC...">
+                <input type="text" id="hangBaoHiem" placeholder="Bảo Việt, PTI, Liberty...">
                 <div id="error-hangBaoHiem" class="error"></div>
             </div>
             <div class="form-group">
@@ -97,24 +96,23 @@
                 <div id="error-bienSo" class="error"></div>
             </div>
             <div class="form-group">
-                <label>Số khung (VIN)</label>
-                <input type="text" id="soKhung" placeholder="VF3...">
+                <label>Ghi chú</label>
+                <textarea id="note" rows="3" placeholder="Ghi chú thêm..."></textarea>
             </div>
         </div>
 
         <div class="button-group">
             <button onclick="themBaoHiem()" class="btn" id="btnAdd">✅ Thêm Bảo Hiểm</button>
-            <a href="danh-sach-bao-hiem.html" 
-               class="btn btn-view" 
-               style="text-decoration:none; display:inline-block;"
-               target="_blank">
+            <a href="danh-sach-bao-hiem.html" class="btn btn-view" style="text-decoration:none; display:inline-block;">
                 📋 Xem Danh Sách Bảo Hiểm
             </a>
         </div>
     </div>
 
     <script>
-        // ==================== KIỂM TRA ĐĂNG NHẬP ====================
+        const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
+
+        // Kiểm tra đăng nhập
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             alert("⛔ Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
             window.location.href = "login.html";
@@ -123,12 +121,11 @@
         const currentRole = localStorage.getItem('role');
         const username = localStorage.getItem('username') || "Người dùng";
 
-        // Hiển thị tên người dùng
         document.getElementById('userDisplay').innerHTML = 
             `Xin chào <strong>${username}</strong> (${currentRole === 'admin' ? 'Quản trị viên' : 'Nhân viên'})`;
 
-        // Ẩn nút Thêm nếu là Nhân viên
-        if (currentRole === 'user') {
+        // Ẩn nút Thêm nếu là nhân viên
+        if (currentRole !== 'admin') {
             document.getElementById('btnAdd').style.display = 'none';
         }
 
@@ -139,85 +136,68 @@
             }
         }
 
-        // Các hàm còn lại giữ nguyên như trước (autoTinhNgayHetHan, validateForm, checkTrungBienSo, themBaoHiem...)
         function autoTinhNgayHetHan() {
             const ngayCap = document.getElementById('ngayCap').value;
-            const ngayHetHan = document.getElementById('ngayHetHan');
             if (ngayCap) {
                 let date = new Date(ngayCap);
                 date.setFullYear(date.getFullYear() + 1);
-                ngayHetHan.value = date.toISOString().slice(0,10);
+                document.getElementById('ngayHetHan').value = date.toISOString().slice(0, 10);
             }
         }
 
-        function validateForm() {
-            let isValid = true;
-            document.querySelectorAll('.error').forEach(el => el.textContent = '');
-
-            if (!document.getElementById('tenKhach').value.trim()) {
-                document.getElementById('error-tenKhach').textContent = "Vui lòng nhập tên khách hàng!";
-                isValid = false;
-            }
-            if (!document.getElementById('sdt').value.trim()) {
-                document.getElementById('error-sdt').textContent = "Vui lòng nhập số điện thoại!";
-                isValid = false;
-            }
-            if (!document.getElementById('ngayCap').value) {
-                document.getElementById('error-ngayCap').textContent = "Vui lòng chọn ngày cấp bảo hiểm!";
-                isValid = false;
-            }
-            if (!document.getElementById('hangBaoHiem').value.trim()) {
-                document.getElementById('error-hangBaoHiem').textContent = "Vui lòng nhập hãng bảo hiểm!";
-                isValid = false;
-            }
-            if (!document.getElementById('bienSo').value.trim()) {
-                document.getElementById('error-bienSo').textContent = "Vui lòng nhập biển số xe!";
-                isValid = false;
-            }
-            return isValid;
-        }
-
-        function checkTrungBienSo(bienSoMoi) {
-            let danhSach = JSON.parse(localStorage.getItem('danhSachBaoHiem')) || [];
-            return danhSach.some(item => item.bienSo && item.bienSo.toUpperCase() === bienSoMoi.toUpperCase());
-        }
-
-        function themBaoHiem() {
+        async function themBaoHiem() {
             if (currentRole !== 'admin') {
                 alert("⛔ Bạn không có quyền thêm bảo hiểm!");
                 return;
             }
-            if (!validateForm()) return;
 
-            const bienSo = document.getElementById('bienSo').value.trim().toUpperCase();
+            // Lấy dữ liệu
+            const data = {
+                tenkhach: document.getElementById('tenKhach').value.trim(),
+                sdt: document.getElementById('sdt').value.trim(),
+                diachi: document.getElementById('diaChi').value.trim(),
+                ngaycap: document.getElementById('ngayCap').value,
+                ngayhethan: document.getElementById('ngayHetHan').value,
+                hangbh: document.getElementById('hangBaoHiem').value.trim(),
+                loaixe: document.getElementById('loaiXe').value.trim(),
+                bienso: document.getElementById('bienSo').value.trim().toUpperCase(),
+                note: document.getElementById('note').value.trim()
+            };
 
-            if (checkTrungBienSo(bienSo)) {
-                document.getElementById('error-bienSo').textContent = "❌ Biển số xe này đã tồn tại!";
-                alert("❌ Không thể thêm! Biển số xe này đã được đăng ký trước đó.");
+            // Kiểm tra bắt buộc
+            if (!data.tenkhach || !data.sdt || !data.ngaycap || !data.hangbh || !data.bienso) {
+                alert("❌ Vui lòng điền đầy đủ các trường có dấu *");
                 return;
             }
 
-            const baoHiemMoi = {
-                id: Date.now(),
-                tenKhach: document.getElementById('tenKhach').value.trim(),
-                sdt: document.getElementById('sdt').value.trim(),
-                diaChi: document.getElementById('diaChi').value.trim() || "Chưa cập nhật",
-                ngayCap: document.getElementById('ngayCap').value,
-                ngayHetHan: document.getElementById('ngayHetHan').value,
-                hangBH: document.getElementById('hangBaoHiem').value.trim(),
-                loaiXe: document.getElementById('loaiXe').value.trim() || "Chưa cập nhật",
-                bienSo: bienSo,
-                soKhung: document.getElementById('soKhung').value.trim() || "Chưa có",
-                note: ""
-            };
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
 
-            let danhSach = JSON.parse(localStorage.getItem('danhSachBaoHiem')) || [];
-            danhSach.unshift(baoHiemMoi);
-            localStorage.setItem('danhSachBaoHiem', JSON.stringify(danhSach));
+                const result = await res.json();
 
-            alert("✅ Đã thêm bảo hiểm thành công!");
-            document.querySelectorAll('input').forEach(input => input.value = '');
+                if (result.success) {
+                    alert("✅ Thêm bảo hiểm thành công!");
+                    // Reset form
+                    document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+                    // Chuyển sang danh sách
+                    window.location.href = "danh-sach-bao-hiem.html";
+                } else {
+                    alert("❌ Thêm thất bại: " + (result.error || result.message || "Lỗi không xác định"));
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ Không kết nối được với server. Vui lòng kiểm tra backend có đang chạy không?");
+            }
         }
+
+        // Nhấn Enter cũng thêm được
+        document.addEventListener('keypress', (e) => {
+            if (e.key === "Enter") themBaoHiem();
+        });
     </script>
 </body>
 </html>
