@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { Pool } = require('pg');
 
 const app = express();
@@ -10,12 +11,22 @@ const PORT = process.env.PORT || 5000;
 
 // ====================== MIDDLEWARE ======================
 app.use(cors({
-    origin: '*',                    // Dùng * để test nhanh (có thể thay sau)
+    origin: '*',                    // Cho phép tất cả (dùng cho dev)
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type']
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ====================== PHỤC VỤ FILE HTML TĨNH ======================
+// Quan trọng: Phục vụ toàn bộ thư mục public
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Route mặc định - mở trang chủ
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'index.html'));
+});
 
 // ====================== KẾT NỐI NEON POSTGRES ======================
 const pool = new Pool({
@@ -53,17 +64,14 @@ app.get('/api/baohiem', async (req, res) => {
         `);
         res.json(result.rows);
     } catch (err) {
-        console.error(err);
+        console.error('Lỗi GET /api/baohiem:', err);
         res.status(500).json({ error: 'Lỗi lấy dữ liệu từ Neon' });
     }
 });
 
 // Thêm mới bảo hiểm
 app.post('/api/baohiem', async (req, res) => {
-    const { 
-        tenkhach, sdt, diachi, ngaycap, ngayhethan, 
-        hangbh, loaixe, bienso, note 
-    } = req.body;
+    const { tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, note } = req.body;
 
     try {
         const result = await pool.query(`
@@ -71,17 +79,7 @@ app.post('/api/baohiem', async (req, res) => {
             (tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, note)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING *
-        `, [
-            tenkhach, 
-            sdt, 
-            diachi || '', 
-            ngaycap, 
-            ngayhethan, 
-            hangbh, 
-            loaixe, 
-            bienso, 
-            note || ''
-        ]);
+        `, [tenkhach, sdt, diachi || '', ngaycap, ngayhethan, hangbh, loaixe, bienso, note || '']);
 
         res.status(201).json({ 
             success: true, 
@@ -89,7 +87,7 @@ app.post('/api/baohiem', async (req, res) => {
             data: result.rows[0] 
         });
     } catch (err) {
-        console.error(err);
+        console.error('Lỗi POST /api/baohiem:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
@@ -97,10 +95,7 @@ app.post('/api/baohiem', async (req, res) => {
 // Sửa bảo hiểm
 app.put('/api/baohiem/:id', async (req, res) => {
     const { id } = req.params;
-    const { 
-        tenkhach, sdt, diachi, ngaycap, ngayhethan, 
-        hangbh, loaixe, bienso, note 
-    } = req.body;
+    const { tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, note } = req.body;
 
     try {
         const result = await pool.query(`
@@ -117,7 +112,7 @@ app.put('/api/baohiem/:id', async (req, res) => {
 
         res.json({ success: true, message: 'Cập nhật thành công', data: result.rows[0] });
     } catch (err) {
-        console.error(err);
+        console.error('Lỗi PUT /api/baohiem:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
@@ -134,13 +129,14 @@ app.delete('/api/baohiem/:id', async (req, res) => {
 
         res.json({ success: true, message: 'Xóa thành công' });
     } catch (err) {
-        console.error(err);
+        console.error('Lỗi DELETE /api/baohiem:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
 // ====================== KHỞI ĐỘNG SERVER ======================
 app.listen(PORT, () => {
-    console.log(`🚀 Server đang chạy tại port ${PORT}`);
-    console.log(`📡 Test connection: http://localhost:${PORT}/api/test`);
+    console.log(`🚀 Server Backend đang chạy tại port ${PORT}`);
+    console.log(`🌐 Frontend: http://localhost:${PORT}`);
+    console.log(`🔗 Test API: http://localhost:${PORT}/api/test`);
 });

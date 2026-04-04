@@ -7,41 +7,112 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         
-        body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); margin:0; padding:20px; }
-        .container { max-width: 1400px; margin: auto; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
-        header { background: linear-gradient(90deg, #007bff, #0056b3); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
         .logo { font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .nav-btn { padding: 10px 22px; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: 500; cursor: pointer; }
+        .nav-btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
         .btn-home { background: #28a745; }
         .btn-add { background: #007bff; }
         .btn-logout { background: #dc3545; }
 
-        .notification-bar { background: #d32f2f; color: white; padding: 15px 25px; margin: 20px; border-radius: 8px; display: none; align-items: center; gap: 15px; font-weight: 600; }
         .main { padding: 30px; }
-        .search-box { width: 100%; max-width: 450px; padding: 12px 20px; border-radius: 50px; border: 2px solid #ddd; font-size: 16px; }
+        .search-box {
+            width: 100%;
+            max-width: 450px;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+        }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
         th { background: #007bff; color: white; }
-        .status { padding: 8px 16px; border-radius: 30px; font-size: 14px; font-weight: 600; display: inline-block; min-width: 145px; }
+        .status {
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 145px;
+        }
         .con-han { background: #d4edda; color: #155724; }
         .sap-het { background: #fff3cd; color: #856404; animation: pulse 2s infinite; }
         .het-han { background: #f8d7da; color: #721c24; }
-        .action-btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; margin-right: 6px; }
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 6px;
+        }
         .edit-btn { background: #ffc107; color: #212529; }
         .delete-btn { background: #dc3545; color: white; }
-        .note-cell { cursor: pointer; min-width: 180px; max-width: 250px; white-space: pre-wrap; }
-        .note-cell:hover { background-color: #f8f9fa; }
+        .note-cell { cursor: pointer; min-width: 180px; }
+        .note-cell:hover { background: #f8f9fa; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 520px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
-        .form-group textarea { height: 80px; resize: vertical; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
         .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
-        .btn-cancel { background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
-        .btn-save { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-cancel { background: #6c757d; color: white; }
+        .btn-save { background: #28a745; color: white; }
 
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
     </style>
@@ -50,7 +121,7 @@
     <div class="container">
         <header>
             <div class="logo">🚗 Danh Sách Bảo Hiểm Ô Tô</div>
-            <div class="nav-buttons">
+            <div>
                 <button onclick="switchToHome()" class="nav-btn btn-home">🏠 Trang Chủ</button>
                 <button onclick="switchToAdd()" class="nav-btn btn-add">Thêm Bảo Hiểm Mới</button>
                 <button onclick="logout()" class="nav-btn btn-logout">Đăng xuất</button>
@@ -58,18 +129,16 @@
         </header>
 
         <div class="main">
-            <div id="notificationBar" class="notification-bar">
-                🚨 CÓ <span id="countExpiring" style="font-size:22px; font-weight:bold"></span>
-                BẢO HIỂM SẮP HẾT HẠN (dưới 30 ngày)
-                <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
+            <div id="notificationBar" class="notification-bar" style="display:none;">
+                🚨 CÓ <span id="countExpiring">0</span> BẢO HIỂM SẮP HẾT HẠN
+                <button onclick="hideNotification()" style="margin-left:auto;background:none;border:none;color:white;font-size:20px;cursor:pointer;">✕</button>
             </div>
 
-            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="searchInput" class="search-box" style="flex: 1;"
-                       placeholder="🔎 Tìm theo tên khách hàng, biển số xe, hãng bảo hiểm, note..."
-                       onkeyup="searchTable()">
+            <div style="margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
+                <input type="text" id="searchInput" class="search-box" 
+                       placeholder="🔎 Tìm theo tên, biển số, hãng BH..." onkeyup="searchTable()">
                 
-                <button onclick="loadData()" style="padding: 10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <button onclick="loadData()" style="padding:10px 20px;background:#17a2b8;color:white;border:none;border-radius:8px;cursor:pointer;">
                     🔄 Tải lại từ Server
                 </button>
             </div>
@@ -86,8 +155,8 @@
                             <th>Hãng BH</th>
                             <th>Loại xe</th>
                             <th>Biển số</th>
-                            <th>Note (Click để sửa)</th>
-                            <th>Trạng thái <button onclick="toggleFilter()" class="filter-btn" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">▼</button></th>
+                            <th>Note</th>
+                            <th>Trạng thái</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
@@ -96,8 +165,8 @@
             </div>
         </div>
 
-        <div style="text-align:center; padding:25px; background:#f8f9fa;">
-            <button onclick="exportData()" style="background:#007bff; color:white; padding:12px 30px; border:none; border-radius:8px; font-size:16px; cursor:pointer;">
+        <div style="text-align:center;padding:25px;background:#f8f9fa;">
+            <button onclick="exportData()" style="background:#007bff;color:white;padding:12px 30px;border:none;border-radius:8px;font-size:16px;cursor:pointer;">
                 📤 Xuất File Excel (CSV)
             </button>
         </div>
@@ -106,87 +175,78 @@
     <!-- Modal Sửa -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
+            <h2>✏️ Sửa Bảo Hiểm</h2>
             <input type="hidden" id="editId">
             <div class="form-group"><label>Tên khách hàng</label><input type="text" id="editTenKhach"></div>
-            <div class="form-group"><label>Số điện thoại</label><input type="text" id="editSdt"></div>
+            <div class="form-group"><label>SĐT</label><input type="text" id="editSdt"></div>
             <div class="form-group"><label>Ngày cấp</label><input type="date" id="editNgayCap"></div>
             <div class="form-group"><label>Ngày hết hạn</label><input type="date" id="editNgayHetHan"></div>
-            <div class="form-group"><label>Hãng bảo hiểm</label><input type="text" id="editHangBH"></div>
+            <div class="form-group"><label>Hãng BH</label><input type="text" id="editHangBH"></div>
             <div class="form-group"><label>Loại xe</label><input type="text" id="editLoaiXe"></div>
-            <div class="form-group"><label>Biển số xe</label><input type="text" id="editBienSo" style="text-transform:uppercase;"></div>
-            <div class="form-group"><label>Ghi chú</label><textarea id="editNote" rows="3"></textarea></div>
+            <div class="form-group"><label>Biển số</label><input type="text" id="editBienSo" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Note</label><textarea id="editNote"></textarea></div>
 
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-                <button class="btn-save" onclick="saveBaoHiem()">Lưu thay đổi</button>
+                <button class="btn-save" onclick="saveEdit()">Lưu</button>
             </div>
         </div>
     </div>
 
     <script>
         const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
+
         let danhSachBaoHiem = [];
-        let trangThaiFilter = "ALL";
 
         async function loadData() {
             try {
                 const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Lỗi server");
                 danhSachBaoHiem = await res.json();
                 renderTable();
-                checkThongBaoDo();
-            } catch (err) {
-                alert("❌ Không tải được dữ liệu từ server!");
+            } catch (e) {
+                console.error(e);
+                alert("❌ Không kết nối được với Backend. Kiểm tra backend có đang chạy không?");
             }
         }
 
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            return new Date(dateStr).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-
         function getTrangThai(ngayHetHan) {
-            if (!ngayHetHan) return { text: "Không xác định", class: "" };
+            if (!ngayHetHan) return {text: "Không rõ", class: ""};
             const today = new Date();
             const hetHan = new Date(ngayHetHan);
-            const diffDays = Math.ceil((hetHan - today) / (86400000));
+            const diff = Math.ceil((hetHan - today) / 86400000);
 
-            if (diffDays < 0) return { text: "HẾT HẠN", class: "het-han" };
-            if (diffDays <= 30) return { text: `SẮP HẾT (${diffDays} ngày)`, class: "sap-het" };
-            return { text: `CÒN HẠN (${diffDays} ngày)`, class: "con-han" };
+            if (diff < 0) return {text: "HẾT HẠN", class: "het-han"};
+            if (diff <= 30) return {text: `SẮP HẾT (${diff} ngày)`, class: "sap-het"};
+            return {text: `CÒN HẠN (${diff} ngày)`, class: "con-han"};
+        }
+
+        function formatDate(date) {
+            if (!date) return '';
+            return new Date(date).toLocaleDateString('vi-VN');
         }
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
-            let list = danhSachBaoHiem;
-            if (trangThaiFilter !== "ALL") {
-                list = list.filter(item => {
-                    const st = getTrangThai(item.ngayhethan);
-                    return (trangThaiFilter === "HET_HAN" && st.class === "het-han") ||
-                           (trangThaiFilter === "SAP_HET" && st.class === "sap-het") ||
-                           (trangThaiFilter === "CON_HAN" && st.class === "con-han");
-                });
-            }
-
-            list.forEach((item, index) => {
-                const status = getTrangThai(item.ngayhethan);
+            danhSachBaoHiem.forEach((item, i) => {
+                const st = getTrangThai(item.ngayhethan || item.ngayHetHan);
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><strong>${item.tenkhach || ''}</strong></td>
+                    <td>${i+1}</td>
+                    <td>${item.tenkhach || item.tenKhach || ''}</td>
                     <td>${item.sdt || ''}</td>
-                    <td>${formatDate(item.ngaycap)}</td>
-                    <td><strong>${formatDate(item.ngayhethan)}</strong></td>
-                    <td>${item.hangbh || ''}</td>
-                    <td>${item.loaixe || ''}</td>
-                    <td style="text-transform:uppercase;">${item.bienso || ''}</td>
-                    <td class="note-cell" onclick="editNoteInline(this, ${item.id})">${item.note || '<i style="color:#aaa;">(Chưa có ghi chú)</i>'}</td>
-                    <td><span class="status ${status.class}">${status.text}</span></td>
+                    <td>${formatDate(item.ngaycap || item.ngayCap)}</td>
+                    <td>${formatDate(item.ngayhethan || item.ngayHetHan)}</td>
+                    <td>${item.hangbh || item.hangBH || ''}</td>
+                    <td>${item.loaixe || item.loaiXe || ''}</td>
+                    <td style="text-transform:uppercase">${item.bienso || item.bienSo || ''}</td>
+                    <td>${item.note || '(Chưa có)'}</td>
+                    <td><span class="status ${st.class}">${st.text}</span></td>
                     <td>
-                        <button onclick="editBaoHiem(${item.id})" class="action-btn edit-btn">✏️ Sửa</button>
-                        <button onclick="deleteBaoHiem(${item.id})" class="action-btn delete-btn">🗑️ Xóa</button>
+                        <button onclick="editBaoHiem(${item.id})" class="action-btn edit-btn">Sửa</button>
+                        <button onclick="deleteBaoHiem(${item.id})" class="action-btn delete-btn">Xóa</button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -198,19 +258,19 @@
             if (!item) return;
 
             document.getElementById('editId').value = item.id;
-            document.getElementById('editTenKhach').value = item.tenkhach || '';
+            document.getElementById('editTenKhach').value = item.tenkhach || item.tenKhach || '';
             document.getElementById('editSdt').value = item.sdt || '';
-            document.getElementById('editNgayCap').value = item.ngaycap ? item.ngaycap.split('T')[0] : '';
-            document.getElementById('editNgayHetHan').value = item.ngayhethan ? item.ngayhethan.split('T')[0] : '';
-            document.getElementById('editHangBH').value = item.hangbh || '';
-            document.getElementById('editLoaiXe').value = item.loaixe || '';
-            document.getElementById('editBienSo').value = item.bienso || '';
+            document.getElementById('editNgayCap').value = (item.ngaycap || item.ngayCap || '').split('T')[0];
+            document.getElementById('editNgayHetHan').value = (item.ngayhethan || item.ngayHetHan || '').split('T')[0];
+            document.getElementById('editHangBH').value = item.hangbh || item.hangBH || '';
+            document.getElementById('editLoaiXe').value = item.loaixe || item.loaiXe || '';
+            document.getElementById('editBienSo').value = item.bienso || item.bienSo || '';
             document.getElementById('editNote').value = item.note || '';
 
             document.getElementById('editModal').style.display = 'flex';
         }
 
-        async function saveBaoHiem() {
+        async function saveEdit() {
             const id = document.getElementById('editId').value;
             const data = {
                 tenkhach: document.getElementById('editTenKhach').value.trim(),
@@ -224,9 +284,11 @@
             };
 
             try {
+                const method = id ? 'PUT' : 'POST';
                 const url = id ? `${API_URL}/${id}` : API_URL;
+
                 const res = await fetch(url, {
-                    method: id ? 'PUT' : 'POST',
+                    method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
@@ -238,102 +300,43 @@
                 } else {
                     alert("❌ Lưu thất bại!");
                 }
-            } catch (err) {
-                alert("❌ Không kết nối được với server");
+            } catch (e) {
+                alert("❌ Không kết nối được với backend");
             }
         }
 
         async function deleteBaoHiem(id) {
-            if (!confirm("Xóa thật không?")) return;
+            if (!confirm("Xóa bảo hiểm này?")) return;
             try {
                 await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
                 loadData();
-            } catch (err) {
+            } catch (e) {
                 alert("Lỗi khi xóa");
             }
-        }
-
-        function editNoteInline(cell, id) {
-            const current = cell.textContent.trim() === '(Chưa có ghi chú)' ? '' : cell.textContent.trim();
-            const input = document.createElement('textarea');
-            input.value = current;
-            input.style.width = "100%";
-            input.style.height = "60px";
-            cell.innerHTML = '';
-            cell.appendChild(input);
-            input.focus();
-
-            const save = async () => {
-                try {
-                    await fetch(`${API_URL}/${id}`, {
-                        method: 'PUT',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ note: input.value.trim() })
-                    });
-                    loadData();
-                } catch(e) { alert("Lỗi cập nhật note"); }
-            };
-            input.onblur = save;
-            input.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } };
         }
 
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
         }
 
-        function checkThongBaoDo() {
-            const today = new Date();
-            let count = danhSachBaoHiem.filter(item => {
-                const diff = Math.ceil((new Date(item.ngayhethan) - today) / 86400000);
-                return diff > 0 && diff <= 30;
-            }).length;
-
-            const bar = document.getElementById('notificationBar');
-            if (count > 0) {
-                document.getElementById('countExpiring').textContent = count;
-                bar.style.display = 'flex';
-            } else {
-                bar.style.display = 'none';
-            }
-        }
-
-        function toggleFilter() {
-            alert("Tính năng lọc trạng thái đang được xây dựng lại. Bạn có thể dùng tìm kiếm ở trên.");
-            // Nếu bạn muốn khôi phục filter menu cũ, nói mình biết để thêm lại
-        }
-
         function searchTable() {
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             if (!keyword) return renderTable();
 
-            const filtered = danhSachBaoHiem.filter(item =>
+            const filtered = danhSachBaoHiem.filter(item => 
                 (item.tenkhach || '').toLowerCase().includes(keyword) ||
-                (item.sdt || '').includes(keyword) ||
-                (item.bienso || '').toLowerCase().includes(keyword) ||
-                (item.hangbh || '').toLowerCase().includes(keyword)
+                (item.bienso || '').toLowerCase().includes(keyword)
             );
-            // Render filtered list
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            // Tạm render full cho đơn giản, bạn có thể cải tiến sau
+            // Tạm thời render lại full (có thể cải tiến sau)
             renderTable();
         }
 
         function exportData() {
-            let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
-            danhSachBaoHiem.forEach((item, i) => {
-                const status = getTrangThai(item.ngayhethan);
-                csv += `${i+1},"${item.tenkhach || ''}","${item.sdt || ''}",${item.ngaycap || ''},${item.ngayhethan || ''},"${item.hangbh || ''}","${item.loaixe || ''}","${item.bienso || ''}","${item.note || ''}","${status.text}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `BaoHiem_Oto_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
+            alert("Chức năng xuất Excel đang được hoàn thiện.");
         }
 
         function logout() {
-            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+            if (confirm("Đăng xuất?")) {
                 localStorage.clear();
                 window.location.href = "login.html";
             }
@@ -342,6 +345,7 @@
         function switchToHome() { window.location.href = "index.html"; }
         function switchToAdd() { window.location.href = "index.html"; }
 
+        // Tự động tải dữ liệu khi mở trang
         window.onload = loadData;
     </script>
 </body>
