@@ -6,7 +6,7 @@
     <title>Danh Sách Bảo Hiểm Ô Tô</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        
+       
         body {
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -172,7 +172,8 @@
         <div class="search-container">
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:0 30px;">
                 <input type="text" id="searchInput" class="search-box" style="flex:1;"
-                       placeholder="🔎 Tìm theo tên, biển số, hãng BH..." onkeyup="searchTable()">
+                       placeholder="🔎 Tìm theo tên, biển số, hãng BH, note, địa chỉ..." 
+                       onkeyup="searchTable()">
                 
                 <button onclick="loadData()" style="padding:10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer; white-space:nowrap;">
                     🔄 Tải lại từ Server
@@ -196,7 +197,7 @@
                             <th>Biển số</th>
                             <th>Note (Click để sửa)</th>
                             <th>
-                                Trạng thái 
+                                Trạng thái
                                 <button class="filter-btn" onclick="toggleFilter(event)">▼</button>
                             </th>
                             <th>Hành động</th>
@@ -312,6 +313,34 @@
             });
         }
 
+        // ==================== TÌM KIẾM THEO TẤT CẢ CÁC TRƯỜNG ====================
+        function searchTable() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!keyword) {
+                renderTable();   // Hiển thị lại toàn bộ nếu không nhập gì
+                return;
+            }
+
+            const filtered = danhSachBaoHiem.filter(item => {
+                const fields = [
+                    item.tenkhach || item.tenKhach || '',
+                    item.sdt || '',
+                    item.diachi || item.diaChi || '',
+                    item.hangbh || item.hangBH || '',
+                    item.loaixe || item.loaiXe || '',
+                    item.bienso || item.bienSo || '',
+                    item.note || ''
+                ];
+
+                return fields.some(field => 
+                    field.toString().toLowerCase().includes(keyword)
+                );
+            });
+
+            renderTable(filtered);
+        }
+
         function editNoteInline(cell, id) {
             const currentNote = cell.textContent.trim() === '(Chưa có)' ? '' : cell.textContent.trim();
             const input = document.createElement('textarea');
@@ -323,9 +352,6 @@
 
             function saveNote() {
                 const newNote = input.value.trim();
-                const item = danhSachBaoHiem.find(x => x.id === id);
-                if (item) item.note = newNote;
-
                 fetch(`${API_URL}/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -456,12 +482,6 @@
             sortDirection = direction;
             currentFilter = "CON_HAN";
             if (document.getElementById('filterMenu')) document.getElementById('filterMenu').remove();
-            renderTable();
-        }
-
-        function searchTable() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!keyword) return renderTable();
             renderTable();
         }
 
