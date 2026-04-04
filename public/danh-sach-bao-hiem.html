@@ -312,7 +312,7 @@
             });
         }
 
-        // ==================== NOTE INLINE - ẤN ENTER ĐỂ LƯU ====================
+        // ==================== NOTE INLINE - ẤN ENTER LƯU NGAY ====================
         function editNoteInline(cell, id) {
             const currentNote = cell.textContent.trim() === '(Chưa có)' ? '' : cell.textContent.trim();
             const input = document.createElement('textarea');
@@ -325,16 +325,20 @@
             const saveNote = async () => {
                 const newNote = input.value.trim();
                 try {
-                    await fetch(`${API_URL}/${id}`, {
+                    const response = await fetch(`${API_URL}/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ note: newNote })
                     });
-                    // Tải lại dữ liệu để cập nhật giao diện
-                    await loadData();
+
+                    if (response.ok) {
+                        await loadData();   // Tải lại toàn bộ dữ liệu để cập nhật note mới
+                    } else {
+                        alert("Lưu note thất bại!");
+                    }
                 } catch (err) {
                     console.error(err);
-                    alert("Lỗi khi lưu note");
+                    alert("Không kết nối được với server khi lưu note");
                 }
             };
 
@@ -347,7 +351,7 @@
             });
         }
 
-        // Các hàm còn lại giữ nguyên
+        // Các hàm khác giữ nguyên
         function editBaoHiem(id) {
             const item = danhSachBaoHiem.find(x => x.id === id);
             if (!item) return;
