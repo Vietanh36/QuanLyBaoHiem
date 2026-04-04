@@ -56,7 +56,7 @@
             font-size: 16px;
         }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
         th { background: #007bff; color: white; position: relative; }
         .status {
             padding: 8px 16px;
@@ -90,8 +90,22 @@
             margin-left: 8px;
         }
 
-        .note-cell { cursor: pointer; min-width: 180px; }
-        .note-cell:hover { background: #f8f9fa; }
+        .note-cell {
+            cursor: pointer;
+            min-width: 180px;
+            max-width: 250px;
+            white-space: pre-wrap;
+        }
+        .note-cell:hover { background-color: #f8f9fa; }
+        .note-input {
+            width: 100%;
+            height: 80px;
+            padding: 8px;
+            border: 2px solid #007bff;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+        }
 
         .modal {
             display: none;
@@ -110,17 +124,22 @@
             width: 90%;
             max-width: 520px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input, .form-group textarea {
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 15px;
         }
+        .form-group textarea { height: 80px; resize: vertical; }
         .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+        .btn-cancel { background: #6c757d; color: white; }
+        .btn-save { background: #28a745; color: white; }
 
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
     </style>
@@ -178,7 +197,7 @@
         </div>
     </div>
 
-    <!-- Modal Sửa -->
+    <!-- ====================== POPUP SỬA ĐẦY ĐỦ ====================== -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
@@ -189,8 +208,8 @@
             <div class="form-group"><label>Ngày hết hạn</label><input type="date" id="editNgayHetHan"></div>
             <div class="form-group"><label>Hãng BH</label><input type="text" id="editHangBH"></div>
             <div class="form-group"><label>Loại xe</label><input type="text" id="editLoaiXe"></div>
-            <div class="form-group"><label>Biển số</label><input type="text" id="editBienSo" style="text-transform:uppercase"></div>
-            <div class="form-group"><label>Note</label><textarea id="editNote" rows="3"></textarea></div>
+            <div class="form-group"><label>Biển số xe</label><input type="text" id="editBienSo" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Ghi chú (Note)</label><textarea id="editNote" rows="4"></textarea></div>
 
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">Hủy</button>
@@ -203,7 +222,7 @@
         const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
         let danhSachBaoHiem = [];
         let currentFilter = "ALL";
-        let sortDirection = null;   // 'asc' hoặc 'desc' theo số ngày còn hạn
+        let sortDirection = null;   // 'asc' hoặc 'desc'
 
         async function loadData() {
             try {
@@ -211,8 +230,8 @@
                 danhSachBaoHiem = await res.json();
                 renderTable();
             } catch (err) {
-                alert("❌ Không tải được dữ liệu từ server!");
                 console.error(err);
+                alert("❌ Không tải được dữ liệu từ server!");
             }
         }
 
@@ -233,7 +252,7 @@
 
             let list = [...danhSachBaoHiem];
 
-            // Lọc theo trạng thái
+            // Lọc trạng thái
             if (currentFilter !== "ALL") {
                 list = list.filter(item => {
                     const st = getTrangThai(item.ngayhethan || item.ngayHetHan);
@@ -276,14 +295,113 @@
             });
         }
 
+        // ==================== INLINE EDIT NOTE (Nhấn Enter để lưu) ====================
+        function editNoteInline(cell, id) {
+            const currentNote = cell.textContent.trim() === '(Chưa có)' ? '' : cell.textContent.trim();
+            const input = document.createElement('textarea');
+            input.className = 'note-input';
+            input.value = currentNote;
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            input.focus();
+
+            function saveNote() {
+                const newNote = input.value.trim();
+                const item = danhSachBaoHiem.find(x => x.id === id);
+                if (item) item.note = newNote;
+
+                // Gọi API cập nhật note
+                fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ note: newNote })
+                }).catch(err => console.error("Lỗi cập nhật note:", err));
+
+                renderTable();
+            }
+
+            input.addEventListener('blur', saveNote);
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    saveNote();
+                }
+            });
+        }
+
+        // ==================== POPUP SỬA ĐẦY ĐỦ ====================
+        function editBaoHiem(id) {
+            const item = danhSachBaoHiem.find(x => x.id === id);
+            if (!item) return;
+
+            document.getElementById('editId').value = item.id;
+            document.getElementById('editTenKhach').value = item.tenkhach || item.tenKhach || '';
+            document.getElementById('editSdt').value = item.sdt || '';
+            document.getElementById('editNgayCap').value = (item.ngaycap || '').split('T')[0];
+            document.getElementById('editNgayHetHan').value = (item.ngayhethan || '').split('T')[0];
+            document.getElementById('editHangBH').value = item.hangbh || item.hangBH || '';
+            document.getElementById('editLoaiXe').value = item.loaixe || item.loaiXe || '';
+            document.getElementById('editBienSo').value = item.bienso || item.bienSo || '';
+            document.getElementById('editNote').value = item.note || '';
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        async function saveEdit() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                tenkhach: document.getElementById('editTenKhach').value.trim(),
+                sdt: document.getElementById('editSdt').value.trim(),
+                ngaycap: document.getElementById('editNgayCap').value,
+                ngayhethan: document.getElementById('editNgayHetHan').value,
+                hangbh: document.getElementById('editHangBH').value.trim(),
+                loaixe: document.getElementById('editLoaiXe').value.trim(),
+                bienso: document.getElementById('editBienSo').value.trim().toUpperCase(),
+                note: document.getElementById('editNote').value.trim()
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    alert("✅ Cập nhật thành công!");
+                    closeModal();
+                    loadData();
+                } else {
+                    alert("❌ Cập nhật thất bại!");
+                }
+            } catch (err) {
+                alert("❌ Không kết nối được với server");
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // ==================== XÓA ====================
+        async function deleteBaoHiem(id) {
+            if (!confirm("Bạn có chắc muốn xóa bảo hiểm này?")) return;
+            try {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                loadData();
+            } catch (err) {
+                alert("Lỗi khi xóa");
+            }
+        }
+
         // ==================== LỌC & SẮP XẾP ====================
         function toggleFilter(e) {
-            let old = document.getElementById('filterMenu');
-            if (old) old.remove();
+            let oldMenu = document.getElementById('filterMenu');
+            if (oldMenu) oldMenu.remove();
 
             const menu = document.createElement('div');
             menu.id = 'filterMenu';
-            menu.style.cssText = `position:absolute; background:white; border:1px solid #ccc; border-radius:8px; box-shadow:0 5px 20px rgba(0,0,0,0.25); padding:8px 0; z-index:1000; min-width:240px;`;
+            menu.style.cssText = `position:absolute; background:white; border:1px solid #ccc; border-radius:8px; box-shadow:0 5px 20px rgba(0,0,0,0.25); padding:8px 0; z-index:1000; min-width:260px;`;
 
             const rect = e.currentTarget.getBoundingClientRect();
             menu.style.top = (rect.bottom + window.scrollY + 8) + 'px';
@@ -292,10 +410,10 @@
             menu.innerHTML = `
                 <div style="padding:10px 16px; font-weight:600; color:#007bff;">Lọc theo trạng thái</div>
                 <div onclick="applyFilter('ALL')" style="padding:12px 20px; cursor:pointer;">📋 Tất cả</div>
-                <div style="border-top:1px solid #eee;margin:5px 0;"></div>
+                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
                 <div onclick="applySort('desc')" style="padding:12px 20px; cursor:pointer;">🔽 Còn hạn: Nhiều ngày nhất</div>
                 <div onclick="applySort('asc')" style="padding:12px 20px; cursor:pointer;">🔼 Còn hạn: Ít ngày nhất</div>
-                <div style="border-top:1px solid #eee;margin:5px 0;"></div>
+                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
                 <div onclick="applyFilter('CON_HAN')" style="padding:12px 20px; cursor:pointer;">🟢 Còn hạn</div>
                 <div onclick="applyFilter('SAP_HET')" style="padding:12px 20px; cursor:pointer;">🟡 Sắp hết hạn</div>
                 <div onclick="applyFilter('HET_HAN')" style="padding:12px 20px; cursor:pointer;">🔴 Hết hạn</div>
@@ -322,43 +440,22 @@
 
         function applySort(direction) {
             sortDirection = direction;
-            currentFilter = "CON_HAN";   // Chỉ sắp xếp trong Còn hạn
+            currentFilter = "CON_HAN";
             if (document.getElementById('filterMenu')) document.getElementById('filterMenu').remove();
             renderTable();
         }
 
-        // ==================== CÁC HÀM KHÁC ====================
-        function editNoteInline(cell, id) {
-            const current = cell.textContent === '(Chưa có)' ? '' : cell.textContent;
-            const input = document.createElement('textarea');
-            input.value = current;
-            input.style.width = "100%";
-            input.style.height = "60px";
-            cell.innerHTML = '';
-            cell.appendChild(input);
-            input.focus();
+        // ==================== TÌM KIẾM & XUẤT EXCEL ====================
+        function searchTable() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!keyword) return renderTable();
 
-            const save = () => {
-                // Tạm thời chỉ lưu note cục bộ (có thể mở rộng sau)
-                alert("Note đã được cập nhật (chức năng đầy đủ sẽ bổ sung sau)");
-                loadData();
-            };
-            input.onblur = save;
-            input.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } };
-        }
-
-        function editBaoHiem(id) {
-            alert("Chức năng sửa chi tiết đang được hoàn thiện. Hiện chỉ hỗ trợ sửa Note.");
-        }
-
-        async function deleteBaoHiem(id) {
-            if (!confirm("Xóa bảo hiểm này?")) return;
-            try {
-                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-                loadData();
-            } catch (e) {
-                alert("Lỗi khi xóa");
-            }
+            const filtered = danhSachBaoHiem.filter(item =>
+                (item.tenkhach || '').toLowerCase().includes(keyword) ||
+                (item.bienso || '').toLowerCase().includes(keyword) ||
+                (item.hangbh || '').toLowerCase().includes(keyword)
+            );
+            renderTable(); // Hiện tại render full, bạn có thể cải tiến sau
         }
 
         function exportData() {
@@ -376,30 +473,16 @@
             alert("✅ Đã xuất file Excel thành công!");
         }
 
-        function searchTable() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!keyword) return renderTable();
-
-            const filtered = danhSachBaoHiem.filter(item =>
-                (item.tenkhach || '').toLowerCase().includes(keyword) ||
-                (item.bienso || '').toLowerCase().includes(keyword) ||
-                (item.hangbh || '').toLowerCase().includes(keyword)
-            );
-            // Render filtered (đơn giản hóa)
-            renderTable();
-        }
-
         function switchToHome() { window.location.href = "index.html"; }
         function switchToAdd() { window.location.href = "index.html"; }
 
         function logout() {
-            if (confirm("Đăng xuất?")) {
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
                 localStorage.clear();
                 window.location.href = "login.html";
             }
         }
 
-        // Tự động tải dữ liệu
         window.onload = loadData;
     </script>
 </body>
