@@ -104,7 +104,7 @@ app.post('/api/baohiem', async (req, res) => {
     }
 });
 
-// Sửa bảo hiểm
+// ==================== SỬA BẢO HIỂM (QUAN TRỌNG - HỖ TRỢ UPDATE NOTE) ====================
 app.put('/api/baohiem/:id', async (req, res) => {
     const { id } = req.params;
     const { 
@@ -115,19 +115,41 @@ app.put('/api/baohiem/:id', async (req, res) => {
     try {
         const result = await pool.query(`
             UPDATE baohiemoto 
-            SET tenkhach = $1, sdt = $2, diachi = $3, ngaycap = $4, ngayhethan = $5,
-                hangbh = $6, loaixe = $7, bienso = $8, note = $9
+            SET tenkhach = $1, 
+                sdt = $2, 
+                diachi = $3, 
+                ngaycap = $4, 
+                ngayhethan = $5,
+                hangbh = $6, 
+                loaixe = $7, 
+                bienso = $8, 
+                note = $9
             WHERE id = $10
             RETURNING *
-        `, [tenkhach, sdt, diachi || '', ngaycap, ngayhethan, hangbh, loaixe, bienso, note, id]);
+        `, [
+            tenkhach, 
+            sdt, 
+            diachi || '', 
+            ngaycap, 
+            ngayhethan, 
+            hangbh, 
+            loaixe, 
+            bienso, 
+            note || '', 
+            id
+        ]);
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Không tìm thấy bảo hiểm' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy bảo hiểm với ID này' });
         }
 
-        res.json({ success: true, message: 'Cập nhật thành công', data: result.rows[0] });
+        res.json({ 
+            success: true, 
+            message: 'Cập nhật thành công', 
+            data: result.rows[0] 
+        });
     } catch (err) {
-        console.error('Lỗi PUT /api/baohiem:', err);
+        console.error('Lỗi PUT /api/baohiem/:id:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
