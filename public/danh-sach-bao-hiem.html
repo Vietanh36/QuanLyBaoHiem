@@ -46,7 +46,7 @@
         .btn-add { background: #007bff; }
         .btn-logout { background: #dc3545; }
 
-        /* Phần tìm kiếm cố định khi cuộn */
+        /* Phần tìm kiếm sticky khi cuộn */
         .search-container {
             position: sticky;
             top: 20px;
@@ -168,14 +168,15 @@
             </div>
         </header>
 
-        <!-- Phần tìm kiếm cố định khi cuộn xuống -->
+        <!-- Phần tìm kiếm sticky -->
         <div class="search-container">
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:0 30px;">
                 <input type="text" id="searchInput" class="search-box" style="flex:1;"
                        placeholder="🔎 Tìm theo tên, biển số, hãng BH, note, địa chỉ..." 
                        onkeyup="searchTable()">
                 
-                <button onclick="loadData()" style="padding:10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer; white-space:nowrap;">
+                <button onclick="loadData()" 
+                        style="padding:10px 22px; background:#17a2b8; color:white; border:none; border-radius:8px; cursor:pointer; white-space:nowrap;">
                     🔄 Tải lại từ Server
                 </button>
             </div>
@@ -265,11 +266,11 @@
             return { text: `CÒN HẠN (${diffDays} ngày)`, class: "con-han" };
         }
 
-        function renderTable() {
+        function renderTable(filteredList = null) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
-            let list = [...danhSachBaoHiem];
+            let list = filteredList || danhSachBaoHiem;
 
             if (currentFilter !== "ALL") {
                 list = list.filter(item => {
@@ -318,23 +319,19 @@
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             
             if (!keyword) {
-                renderTable();   // Hiển thị lại toàn bộ nếu không nhập gì
+                renderTable();   // Hiển thị lại toàn bộ khi xóa từ khóa
                 return;
             }
 
             const filtered = danhSachBaoHiem.filter(item => {
-                const fields = [
-                    item.tenkhach || item.tenKhach || '',
-                    item.sdt || '',
-                    item.diachi || item.diaChi || '',
-                    item.hangbh || item.hangBH || '',
-                    item.loaixe || item.loaiXe || '',
-                    item.bienso || item.bienSo || '',
-                    item.note || ''
-                ];
-
-                return fields.some(field => 
-                    field.toString().toLowerCase().includes(keyword)
+                return (
+                    (item.tenkhach || item.tenKhach || '').toLowerCase().includes(keyword) ||
+                    (item.sdt || '').toString().includes(keyword) ||
+                    (item.diachi || item.diaChi || '').toLowerCase().includes(keyword) ||
+                    (item.hangbh || item.hangBH || '').toLowerCase().includes(keyword) ||
+                    (item.loaixe || item.loaiXe || '').toLowerCase().includes(keyword) ||
+                    (item.bienso || item.bienSo || '').toLowerCase().includes(keyword) ||
+                    (item.note || '').toLowerCase().includes(keyword)
                 );
             });
 
@@ -357,7 +354,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ note: newNote })
                 }).catch(err => console.error(err));
-
                 renderTable();
             }
 
