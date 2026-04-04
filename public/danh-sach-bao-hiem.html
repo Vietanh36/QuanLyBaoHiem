@@ -46,6 +46,7 @@
         .btn-add { background: #007bff; }
         .btn-logout { background: #dc3545; }
 
+        /* Phần tìm kiếm sticky */
         .search-container {
             position: sticky;
             top: 20px;
@@ -167,6 +168,7 @@
             </div>
         </header>
 
+        <!-- Phần tìm kiếm sticky -->
         <div class="search-container">
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:0 30px;">
                 <input type="text" id="searchInput" class="search-box" style="flex:1;"
@@ -312,7 +314,7 @@
             });
         }
 
-        // ==================== NOTE INLINE - SỬA LẠI ĐỂ LƯU CHẮC CHẮN ====================
+        // ==================== NOTE INLINE - ẤN ENTER ĐỂ LƯU ====================
         function editNoteInline(cell, id) {
             const currentNote = cell.textContent.trim() === '(Chưa có)' ? '' : cell.textContent.trim();
             const input = document.createElement('textarea');
@@ -324,7 +326,6 @@
 
             const saveNote = async () => {
                 const newNote = input.value.trim();
-
                 try {
                     const response = await fetch(`${API_URL}/${id}`, {
                         method: 'PUT',
@@ -333,10 +334,10 @@
                     });
 
                     if (response.ok) {
-                        alert("✅ Note đã được lưu!");
-                        await loadData();   // Tải lại bảng để hiển thị note mới
+                        alert("✅ Note đã được lưu thành công!");
+                        await loadData();        // Tải lại bảng để hiển thị note mới
                     } else {
-                        alert("❌ Lưu note thất bại! (Server trả về lỗi)");
+                        alert("❌ Lưu note thất bại! Server trả về lỗi");
                     }
                 } catch (err) {
                     console.error(err);
