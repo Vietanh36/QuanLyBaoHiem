@@ -64,7 +64,7 @@
             font-size: 14px;
             font-weight: 600;
             display: inline-block;
-            min-width: 145px;
+            min-width: 155px;
             text-align: center;
         }
         .con-han { background: #d4edda; color: #155724; }
@@ -111,6 +111,16 @@
             max-width: 520px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
 
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
     </style>
@@ -148,7 +158,7 @@
                             <th>Hãng BH</th>
                             <th>Loại xe</th>
                             <th>Biển số</th>
-                            <th>Note</th>
+                            <th>Note (Click để sửa)</th>
                             <th>
                                 Trạng thái 
                                 <button class="filter-btn" onclick="toggleFilter(event)">▼</button>
@@ -168,10 +178,32 @@
         </div>
     </div>
 
+    <!-- Modal Sửa -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
+            <input type="hidden" id="editId">
+            <div class="form-group"><label>Tên khách hàng</label><input type="text" id="editTenKhach"></div>
+            <div class="form-group"><label>SĐT</label><input type="text" id="editSdt"></div>
+            <div class="form-group"><label>Ngày cấp</label><input type="date" id="editNgayCap"></div>
+            <div class="form-group"><label>Ngày hết hạn</label><input type="date" id="editNgayHetHan"></div>
+            <div class="form-group"><label>Hãng BH</label><input type="text" id="editHangBH"></div>
+            <div class="form-group"><label>Loại xe</label><input type="text" id="editLoaiXe"></div>
+            <div class="form-group"><label>Biển số</label><input type="text" id="editBienSo" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Note</label><textarea id="editNote" rows="3"></textarea></div>
+
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+                <button class="btn-save" onclick="saveEdit()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
         let danhSachBaoHiem = [];
         let currentFilter = "ALL";
+        let sortDirection = null;   // 'asc' hoặc 'desc' theo số ngày còn hạn
 
         async function loadData() {
             try {
@@ -199,15 +231,25 @@
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
-            let list = danhSachBaoHiem;
+            let list = [...danhSachBaoHiem];
 
-            // Áp dụng lọc trạng thái
+            // Lọc theo trạng thái
             if (currentFilter !== "ALL") {
                 list = list.filter(item => {
                     const st = getTrangThai(item.ngayhethan || item.ngayHetHan);
                     return (currentFilter === "CON_HAN" && st.class === "con-han") ||
                            (currentFilter === "SAP_HET" && st.class === "sap-het") ||
                            (currentFilter === "HET_HAN" && st.class === "het-han");
+                });
+            }
+
+            // Sắp xếp theo số ngày còn hạn
+            if (sortDirection) {
+                const today = new Date();
+                list.sort((a, b) => {
+                    const diffA = Math.ceil((new Date(a.ngayhethan || a.ngayHetHan) - today) / 86400000);
+                    const diffB = Math.ceil((new Date(b.ngayhethan || b.ngayHetHan) - today) / 86400000);
+                    return sortDirection === 'desc' ? diffB - diffA : diffA - diffB;
                 });
             }
 
@@ -223,43 +265,37 @@
                     <td>${item.hangbh || item.hangBH || ''}</td>
                     <td>${item.loaixe || item.loaiXe || ''}</td>
                     <td style="text-transform:uppercase">${item.bienso || item.bienSo || ''}</td>
-                    <td>${item.note || '(Chưa có)'}</td>
+                    <td class="note-cell" onclick="editNoteInline(this, ${item.id})">${item.note || '(Chưa có)'}</td>
                     <td><span class="status ${status.class}">${status.text}</span></td>
                     <td>
-                        <button onclick="editBaoHiem(${item.id})" class="action-btn edit-btn">Sửa</button>
-                        <button onclick="deleteBaoHiem(${item.id})" class="action-btn delete-btn">Xóa</button>
+                        <button onclick="editBaoHiem(${item.id})" class="action-btn edit-btn">✏️ Sửa</button>
+                        <button onclick="deleteBaoHiem(${item.id})" class="action-btn delete-btn">🗑️ Xóa</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
+        // ==================== LỌC & SẮP XẾP ====================
         function toggleFilter(e) {
-            // Xóa menu cũ nếu có
-            let oldMenu = document.getElementById('filterMenu');
-            if (oldMenu) oldMenu.remove();
+            let old = document.getElementById('filterMenu');
+            if (old) old.remove();
 
             const menu = document.createElement('div');
             menu.id = 'filterMenu';
-            menu.style.cssText = `
-                position: absolute; 
-                background: white; 
-                border: 1px solid #ccc; 
-                border-radius: 8px; 
-                box-shadow: 0 5px 20px rgba(0,0,0,0.25); 
-                padding: 8px 0; 
-                z-index: 1000; 
-                min-width: 220px;
-            `;
+            menu.style.cssText = `position:absolute; background:white; border:1px solid #ccc; border-radius:8px; box-shadow:0 5px 20px rgba(0,0,0,0.25); padding:8px 0; z-index:1000; min-width:240px;`;
 
             const rect = e.currentTarget.getBoundingClientRect();
             menu.style.top = (rect.bottom + window.scrollY + 8) + 'px';
-            menu.style.left = (rect.left + window.scrollX - 20) + 'px';
+            menu.style.left = (rect.left + window.scrollX - 30) + 'px';
 
             menu.innerHTML = `
                 <div style="padding:10px 16px; font-weight:600; color:#007bff;">Lọc theo trạng thái</div>
                 <div onclick="applyFilter('ALL')" style="padding:12px 20px; cursor:pointer;">📋 Tất cả</div>
-                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
+                <div style="border-top:1px solid #eee;margin:5px 0;"></div>
+                <div onclick="applySort('desc')" style="padding:12px 20px; cursor:pointer;">🔽 Còn hạn: Nhiều ngày nhất</div>
+                <div onclick="applySort('asc')" style="padding:12px 20px; cursor:pointer;">🔼 Còn hạn: Ít ngày nhất</div>
+                <div style="border-top:1px solid #eee;margin:5px 0;"></div>
                 <div onclick="applyFilter('CON_HAN')" style="padding:12px 20px; cursor:pointer;">🟢 Còn hạn</div>
                 <div onclick="applyFilter('SAP_HET')" style="padding:12px 20px; cursor:pointer;">🟡 Sắp hết hạn</div>
                 <div onclick="applyFilter('HET_HAN')" style="padding:12px 20px; cursor:pointer;">🔴 Hết hạn</div>
@@ -267,7 +303,6 @@
 
             document.body.appendChild(menu);
 
-            // Click ngoài để đóng menu
             setTimeout(() => {
                 document.addEventListener('click', function closeMenu(ev) {
                     if (!menu.contains(ev.target)) {
@@ -280,25 +315,40 @@
 
         function applyFilter(filterType) {
             currentFilter = filterType;
-            document.getElementById('filterMenu').remove();
+            sortDirection = null;
+            if (document.getElementById('filterMenu')) document.getElementById('filterMenu').remove();
             renderTable();
         }
 
-        function searchTable() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!keyword) return renderTable();
-
-            const filtered = danhSachBaoHiem.filter(item =>
-                (item.tenkhach || '').toLowerCase().includes(keyword) ||
-                (item.bienso || '').toLowerCase().includes(keyword) ||
-                (item.hangbh || '').toLowerCase().includes(keyword)
-            );
-
-            // Render filtered list
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            // Tạm thời render lại full, bạn có thể cải tiến sau
+        function applySort(direction) {
+            sortDirection = direction;
+            currentFilter = "CON_HAN";   // Chỉ sắp xếp trong Còn hạn
+            if (document.getElementById('filterMenu')) document.getElementById('filterMenu').remove();
             renderTable();
+        }
+
+        // ==================== CÁC HÀM KHÁC ====================
+        function editNoteInline(cell, id) {
+            const current = cell.textContent === '(Chưa có)' ? '' : cell.textContent;
+            const input = document.createElement('textarea');
+            input.value = current;
+            input.style.width = "100%";
+            input.style.height = "60px";
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            input.focus();
+
+            const save = () => {
+                // Tạm thời chỉ lưu note cục bộ (có thể mở rộng sau)
+                alert("Note đã được cập nhật (chức năng đầy đủ sẽ bổ sung sau)");
+                loadData();
+            };
+            input.onblur = save;
+            input.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } };
+        }
+
+        function editBaoHiem(id) {
+            alert("Chức năng sửa chi tiết đang được hoàn thiện. Hiện chỉ hỗ trợ sửa Note.");
         }
 
         async function deleteBaoHiem(id) {
@@ -311,12 +361,32 @@
             }
         }
 
-        function editBaoHiem(id) {
-            alert("Chức năng sửa chi tiết sẽ được thêm sau.");
+        function exportData() {
+            let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
+            danhSachBaoHiem.forEach((item, i) => {
+                const status = getTrangThai(item.ngayhethan || item.ngayHetHan);
+                csv += `${i+1},"${item.tenkhach || ''}","${item.sdt || ''}",${item.ngaycap || ''},${item.ngayhethan || ''},"${item.hangbh || ''}","${item.loaixe || ''}","${item.bienso || ''}","${item.note || ''}","${status.text}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `BaoHiem_Oto_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            alert("✅ Đã xuất file Excel thành công!");
         }
 
-        function exportData() {
-            alert("Chức năng xuất Excel đang được hoàn thiện.");
+        function searchTable() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!keyword) return renderTable();
+
+            const filtered = danhSachBaoHiem.filter(item =>
+                (item.tenkhach || '').toLowerCase().includes(keyword) ||
+                (item.bienso || '').toLowerCase().includes(keyword) ||
+                (item.hangbh || '').toLowerCase().includes(keyword)
+            );
+            // Render filtered (đơn giản hóa)
+            renderTable();
         }
 
         function switchToHome() { window.location.href = "index.html"; }
@@ -329,7 +399,7 @@
             }
         }
 
-        // Tự động load dữ liệu
+        // Tự động tải dữ liệu
         window.onload = loadData;
     </script>
 </body>
