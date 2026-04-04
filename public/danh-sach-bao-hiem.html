@@ -46,7 +46,7 @@
         .btn-add { background: #007bff; }
         .btn-logout { background: #dc3545; }
 
-        /* Phần tìm kiếm sticky khi cuộn */
+        /* Phần tìm kiếm sticky */
         .search-container {
             position: sticky;
             top: 20px;
@@ -142,7 +142,7 @@
         }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input, .form-group textarea, .form-group select {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -317,9 +317,8 @@
         // ==================== TÌM KIẾM THEO TẤT CẢ CÁC TRƯỜNG ====================
         function searchTable() {
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-            
             if (!keyword) {
-                renderTable();   // Hiển thị lại toàn bộ khi xóa từ khóa
+                renderTable();
                 return;
             }
 
@@ -338,6 +337,7 @@
             renderTable(filtered);
         }
 
+        // ==================== CHỨC NĂNG NOTE INLINE (BẤM ENTER ĐỂ LƯU) ====================
         function editNoteInline(cell, id) {
             const currentNote = cell.textContent.trim() === '(Chưa có)' ? '' : cell.textContent.trim();
             const input = document.createElement('textarea');
@@ -354,6 +354,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ note: newNote })
                 }).catch(err => console.error(err));
+
                 renderTable();
             }
 
