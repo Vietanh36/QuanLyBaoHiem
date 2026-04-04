@@ -172,6 +172,7 @@
                             <th>STT</th>
                             <th>Tên khách hàng</th>
                             <th>SĐT</th>
+                            <th>Địa chỉ</th>                    <!-- Cột Địa chỉ đã thêm -->
                             <th>Ngày cấp</th>
                             <th>Ngày hết hạn</th>
                             <th>Hãng BH</th>
@@ -197,13 +198,14 @@
         </div>
     </div>
 
-    <!-- ====================== POPUP SỬA ĐẦY ĐỦ ====================== -->
+    <!-- Popup Sửa Đầy Đủ -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
             <input type="hidden" id="editId">
             <div class="form-group"><label>Tên khách hàng</label><input type="text" id="editTenKhach"></div>
             <div class="form-group"><label>SĐT</label><input type="text" id="editSdt"></div>
+            <div class="form-group"><label>Địa chỉ</label><input type="text" id="editDiaChi"></div>
             <div class="form-group"><label>Ngày cấp</label><input type="date" id="editNgayCap"></div>
             <div class="form-group"><label>Ngày hết hạn</label><input type="date" id="editNgayHetHan"></div>
             <div class="form-group"><label>Hãng BH</label><input type="text" id="editHangBH"></div>
@@ -222,7 +224,7 @@
         const API_URL = "https://baohiem-backend-kdks.onrender.com/api/baohiem";
         let danhSachBaoHiem = [];
         let currentFilter = "ALL";
-        let sortDirection = null;   // 'asc' hoặc 'desc'
+        let sortDirection = null;
 
         async function loadData() {
             try {
@@ -252,7 +254,6 @@
 
             let list = [...danhSachBaoHiem];
 
-            // Lọc trạng thái
             if (currentFilter !== "ALL") {
                 list = list.filter(item => {
                     const st = getTrangThai(item.ngayhethan || item.ngayHetHan);
@@ -262,7 +263,6 @@
                 });
             }
 
-            // Sắp xếp theo số ngày còn hạn
             if (sortDirection) {
                 const today = new Date();
                 list.sort((a, b) => {
@@ -279,6 +279,7 @@
                     <td>${index + 1}</td>
                     <td>${item.tenkhach || item.tenKhach || ''}</td>
                     <td>${item.sdt || ''}</td>
+                    <td>${item.diachi || item.diaChi || 'Chưa cập nhật'}</td>
                     <td>${item.ngaycap ? new Date(item.ngaycap).toLocaleDateString('vi-VN') : ''}</td>
                     <td>${item.ngayhethan ? new Date(item.ngayhethan).toLocaleDateString('vi-VN') : ''}</td>
                     <td>${item.hangbh || item.hangBH || ''}</td>
@@ -295,7 +296,7 @@
             });
         }
 
-        // ==================== INLINE EDIT NOTE (Nhấn Enter để lưu) ====================
+        // Inline Edit Note - Nhấn Enter để lưu
         function editNoteInline(cell, id) {
             const currentNote = cell.textContent.trim() === '(Chưa có)' ? '' : cell.textContent.trim();
             const input = document.createElement('textarea');
@@ -310,12 +311,11 @@
                 const item = danhSachBaoHiem.find(x => x.id === id);
                 if (item) item.note = newNote;
 
-                // Gọi API cập nhật note
                 fetch(`${API_URL}/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ note: newNote })
-                }).catch(err => console.error("Lỗi cập nhật note:", err));
+                }).catch(err => console.error(err));
 
                 renderTable();
             }
@@ -329,7 +329,7 @@
             });
         }
 
-        // ==================== POPUP SỬA ĐẦY ĐỦ ====================
+        // Popup Sửa Đầy Đủ
         function editBaoHiem(id) {
             const item = danhSachBaoHiem.find(x => x.id === id);
             if (!item) return;
@@ -337,6 +337,7 @@
             document.getElementById('editId').value = item.id;
             document.getElementById('editTenKhach').value = item.tenkhach || item.tenKhach || '';
             document.getElementById('editSdt').value = item.sdt || '';
+            document.getElementById('editDiaChi').value = item.diachi || item.diaChi || '';
             document.getElementById('editNgayCap').value = (item.ngaycap || '').split('T')[0];
             document.getElementById('editNgayHetHan').value = (item.ngayhethan || '').split('T')[0];
             document.getElementById('editHangBH').value = item.hangbh || item.hangBH || '';
@@ -352,6 +353,7 @@
             const data = {
                 tenkhach: document.getElementById('editTenKhach').value.trim(),
                 sdt: document.getElementById('editSdt').value.trim(),
+                diachi: document.getElementById('editDiaChi').value.trim(),
                 ngaycap: document.getElementById('editNgayCap').value,
                 ngayhethan: document.getElementById('editNgayHetHan').value,
                 hangbh: document.getElementById('editHangBH').value.trim(),
@@ -383,9 +385,8 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
-        // ==================== XÓA ====================
         async function deleteBaoHiem(id) {
-            if (!confirm("Bạn có chắc muốn xóa bảo hiểm này?")) return;
+            if (!confirm("Xóa bảo hiểm này?")) return;
             try {
                 await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
                 loadData();
@@ -394,7 +395,6 @@
             }
         }
 
-        // ==================== LỌC & SẮP XẾP ====================
         function toggleFilter(e) {
             let oldMenu = document.getElementById('filterMenu');
             if (oldMenu) oldMenu.remove();
@@ -410,10 +410,10 @@
             menu.innerHTML = `
                 <div style="padding:10px 16px; font-weight:600; color:#007bff;">Lọc theo trạng thái</div>
                 <div onclick="applyFilter('ALL')" style="padding:12px 20px; cursor:pointer;">📋 Tất cả</div>
-                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
+                <div style="border-top:1px solid #eee;margin:5px 0;"></div>
                 <div onclick="applySort('desc')" style="padding:12px 20px; cursor:pointer;">🔽 Còn hạn: Nhiều ngày nhất</div>
                 <div onclick="applySort('asc')" style="padding:12px 20px; cursor:pointer;">🔼 Còn hạn: Ít ngày nhất</div>
-                <div style="border-top:1px solid #eee; margin:5px 0;"></div>
+                <div style="border-top:1px solid #eee;margin:5px 0;"></div>
                 <div onclick="applyFilter('CON_HAN')" style="padding:12px 20px; cursor:pointer;">🟢 Còn hạn</div>
                 <div onclick="applyFilter('SAP_HET')" style="padding:12px 20px; cursor:pointer;">🟡 Sắp hết hạn</div>
                 <div onclick="applyFilter('HET_HAN')" style="padding:12px 20px; cursor:pointer;">🔴 Hết hạn</div>
@@ -445,24 +445,17 @@
             renderTable();
         }
 
-        // ==================== TÌM KIẾM & XUẤT EXCEL ====================
         function searchTable() {
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             if (!keyword) return renderTable();
-
-            const filtered = danhSachBaoHiem.filter(item =>
-                (item.tenkhach || '').toLowerCase().includes(keyword) ||
-                (item.bienso || '').toLowerCase().includes(keyword) ||
-                (item.hangbh || '').toLowerCase().includes(keyword)
-            );
-            renderTable(); // Hiện tại render full, bạn có thể cải tiến sau
+            renderTable();
         }
 
         function exportData() {
-            let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
+            let csv = "\uFEFFSTT,Tên khách hàng,SĐT,Địa chỉ,Ngày cấp,Ngày hết hạn,Hãng BH,Loại xe,Biển số,Note,Trạng thái\n";
             danhSachBaoHiem.forEach((item, i) => {
                 const status = getTrangThai(item.ngayhethan || item.ngayHetHan);
-                csv += `${i+1},"${item.tenkhach || ''}","${item.sdt || ''}",${item.ngaycap || ''},${item.ngayhethan || ''},"${item.hangbh || ''}","${item.loaixe || ''}","${item.bienso || ''}","${item.note || ''}","${status.text}"\n`;
+                csv += `${i+1},"${item.tenkhach || ''}","${item.sdt || ''}","${item.diachi || item.diaChi || ''}",${item.ngaycap || ''},${item.ngayhethan || ''},"${item.hangbh || ''}","${item.loaixe || ''}","${item.bienso || ''}","${item.note || ''}","${status.text}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

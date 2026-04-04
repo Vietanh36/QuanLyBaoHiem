@@ -20,7 +20,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ====================== PHỤC VỤ FILE HTML TĨNH ======================
-// Quan trọng: Phục vụ toàn bộ thư mục public
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Route mặc định - mở trang chủ
@@ -71,7 +70,10 @@ app.get('/api/baohiem', async (req, res) => {
 
 // Thêm mới bảo hiểm
 app.post('/api/baohiem', async (req, res) => {
-    const { tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, note } = req.body;
+    const { 
+        tenkhach, sdt, diachi, ngaycap, ngayhethan, 
+        hangbh, loaixe, bienso, note 
+    } = req.body;
 
     try {
         const result = await pool.query(`
@@ -79,7 +81,17 @@ app.post('/api/baohiem', async (req, res) => {
             (tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, note)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING *
-        `, [tenkhach, sdt, diachi || '', ngaycap, ngayhethan, hangbh, loaixe, bienso, note || '']);
+        `, [
+            tenkhach, 
+            sdt, 
+            diachi || '', 
+            ngaycap, 
+            ngayhethan, 
+            hangbh, 
+            loaixe, 
+            bienso, 
+            note || ''
+        ]);
 
         res.status(201).json({ 
             success: true, 
@@ -95,7 +107,10 @@ app.post('/api/baohiem', async (req, res) => {
 // Sửa bảo hiểm
 app.put('/api/baohiem/:id', async (req, res) => {
     const { id } = req.params;
-    const { tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, note } = req.body;
+    const { 
+        tenkhach, sdt, diachi, ngaycap, ngayhethan, 
+        hangbh, loaixe, bienso, note 
+    } = req.body;
 
     try {
         const result = await pool.query(`
@@ -104,7 +119,7 @@ app.put('/api/baohiem/:id', async (req, res) => {
                 hangbh = $6, loaixe = $7, bienso = $8, note = $9
             WHERE id = $10
             RETURNING *
-        `, [tenkhach, sdt, diachi, ngaycap, ngayhethan, hangbh, loaixe, bienso, note, id]);
+        `, [tenkhach, sdt, diachi || '', ngaycap, ngayhethan, hangbh, loaixe, bienso, note, id]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Không tìm thấy bảo hiểm' });

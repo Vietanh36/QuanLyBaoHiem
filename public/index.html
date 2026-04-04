@@ -28,11 +28,27 @@
         .form-group { display: flex; flex-direction: column; }
         label { font-weight: 500; margin-bottom: 8px; color: #333; }
         .required::after { content: " *"; color: red; }
-        input, textarea { padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
-        input:focus, textarea:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.2); }
+        input, textarea { 
+            padding: 12px 15px; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 16px; 
+        }
+        input:focus, textarea:focus { 
+            border-color: #007bff; 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.2); 
+        }
         .btn {
-            background: #28a745; color: white; border: none; padding: 14px 30px;
-            border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; margin: 10px 5px;
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            padding: 14px 30px;
+            border-radius: 8px; 
+            font-size: 18px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin: 10px 5px;
         }
         .btn:hover { background: #218838; }
         .btn-view { background: #007bff; }
@@ -70,7 +86,7 @@
             </div>
             <div class="form-group">
                 <label>Địa chỉ</label>
-                <input type="text" id="diaChi" placeholder="Lao Cai, Việt Nam">
+                <input type="text" id="diaChi" placeholder="Hà Nội, Việt Nam">
             </div>
             <div class="form-group">
                 <label class="required">Ngày cấp bảo hiểm</label>
@@ -103,7 +119,9 @@
 
         <div class="button-group">
             <button onclick="themBaoHiem()" class="btn" id="btnAdd">✅ Thêm Bảo Hiểm</button>
-            <a href="danh-sach-bao-hiem.html" class="btn btn-view" style="text-decoration:none; display:inline-block;">
+            <a href="danh-sach-bao-hiem.html" 
+               class="btn btn-view" 
+               style="text-decoration:none; display:inline-block;">
                 📋 Xem Danh Sách Bảo Hiểm
             </a>
         </div>
@@ -151,7 +169,6 @@
                 return;
             }
 
-            // Lấy dữ liệu
             const data = {
                 tenkhach: document.getElementById('tenKhach').value.trim(),
                 sdt: document.getElementById('sdt').value.trim(),
