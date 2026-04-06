@@ -90,10 +90,10 @@
                 return;
             }
 
-            // Lấy danh sách tài khoản từ localStorage
+            // Lấy danh sách users từ localStorage
             let users = JSON.parse(localStorage.getItem('users')) || [];
 
-            // Nếu chưa có tài khoản nào, tạo tài khoản admin mặc định
+            // Nếu chưa có users nào, tạo tài khoản admin mặc định
             if (users.length === 0) {
                 users = [{
                     email: "admin1@ad.com",
@@ -117,7 +117,9 @@
                 localStorage.setItem('email', user.email);
 
                 alert(`✅ Đăng nhập thành công!\nChào mừng ${user.email}`);
-                window.location.href = "danh-sach-bao-hiem.html";   // hoặc index.html tùy bạn
+                
+                // CHUYỂN HƯỚNG VỀ TRANG CHỦ index.html như bạn yêu cầu
+                window.location.href = "index.html";
             } else {
                 errorEl.textContent = "❌ Sai email hoặc mật khẩu!";
             }
@@ -128,12 +130,12 @@
             if (e.key === "Enter") login();
         });
 
-        // Nếu đã đăng nhập thì chuyển thẳng
+        // Nếu đã đăng nhập thì chuyển thẳng về trang chủ
         if (localStorage.getItem('isLoggedIn') === 'true') {
-            window.location.href = "danh-sach-bao-hiem.html";
+            window.location.href = "index.html";
         }
 
-        // Focus vào ô email khi load trang
+        // Focus vào ô email khi tải trang
         window.onload = () => {
             document.getElementById('email').focus();
         };
