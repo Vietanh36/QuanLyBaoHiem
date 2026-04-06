@@ -120,6 +120,20 @@
             resize: vertical;
         }
 
+        /* Thông báo đỏ cho sắp hết hạn */
+        .notification-bar {
+            background: #d32f2f;
+            color: white;
+            padding: 15px 25px;
+            margin: 15px 30px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -167,6 +181,13 @@
                 <button onclick="logout()" class="nav-btn btn-logout">Đăng xuất</button>
             </div>
         </header>
+
+        <!-- Thông báo đỏ cho sắp hết hạn -->
+        <div id="notificationBar" class="notification-bar">
+            🚨 CÓ <span id="countExpiring" style="font-size:22px; font-weight:bold"></span> 
+            BẢO HIỂM SẮP HẾT HẠN (dưới 30 ngày)
+            <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
+        </div>
 
         <!-- Phần tìm kiếm sticky -->
         <div class="search-container">
@@ -249,6 +270,7 @@
                 const res = await fetch(API_URL);
                 danhSachBaoHiem = await res.json();
                 renderTable();
+                checkThongBaoDo();   // Kiểm tra và hiển thị thông báo đỏ
             } catch (err) {
                 console.error(err);
                 alert("❌ Không tải được dữ liệu từ server!");
@@ -314,7 +336,32 @@
             });
         }
 
-        // ==================== NOTE INLINE - ẤN ENTER ĐỂ LƯU ====================
+        // ==================== THÔNG BÁO ĐỎ - SẮP HẾT HẠN DƯỚI 30 NGÀY ====================
+        function checkThongBaoDo() {
+            const today = new Date();
+            let count = 0;
+
+            danhSachBaoHiem.forEach(item => {
+                const diffDays = Math.ceil((new Date(item.ngayhethan || item.ngayHetHan) - today) / (1000 * 60 * 60 * 24));
+                if (diffDays > 0 && diffDays <= 30) count++;
+            });
+
+            const bar = document.getElementById('notificationBar');
+            const countEl = document.getElementById('countExpiring');
+
+            if (count > 0) {
+                countEl.textContent = count;
+                bar.style.display = 'flex';
+            } else {
+                bar.style.display = 'none';
+            }
+        }
+
+        function hideNotification() {
+            document.getElementById('notificationBar').style.display = 'none';
+        }
+
+        // ==================== NOTE INLINE ====================
         function editNoteInline(cell, id) {
             const currentNote = cell.textContent.trim() === '(Chưa có)' ? '' : cell.textContent.trim();
             const input = document.createElement('textarea');
@@ -335,7 +382,7 @@
 
                     if (response.ok) {
                         alert("✅ Note đã được lưu thành công!");
-                        await loadData();        // Tải lại bảng để hiển thị note mới
+                        await loadData();
                     } else {
                         alert("❌ Lưu note thất bại! Server trả về lỗi");
                     }
