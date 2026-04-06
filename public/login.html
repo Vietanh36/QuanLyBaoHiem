@@ -74,29 +74,26 @@
             const password = document.getElementById('password').value.trim();
             const errorEl = document.getElementById('error');
 
+            console.log("=== ĐANG THỬ ĐĂNG NHẬP ===");
+            console.log("Email:", email);
+            console.log("Password:", password);
+
             if (!email || !password) {
                 errorEl.textContent = "❌ Vui lòng nhập email và mật khẩu!";
                 return;
             }
 
             let users = JSON.parse(localStorage.getItem('users')) || [];
+            console.log("Danh sách users trong localStorage:", users);
 
-            // Tạo admin mặc định nếu chưa có dữ liệu
-            if (users.length === 0) {
-                users = [{
-                    email: "admin1@ad.com",
-                    password: "123456",
-                    role: "admin",
-                    createdAt: new Date().toISOString()
-                }];
-                localStorage.setItem('users', JSON.stringify(users));
-            }
-
+            // Tìm user khớp
             const user = users.find(u => 
                 u.email.toLowerCase() === email && u.password === password
             );
 
             if (user) {
+                console.log("✅ Tìm thấy user:", user);
+                
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('role', user.role);
                 localStorage.setItem('username', user.email);
@@ -105,19 +102,24 @@
                 alert(`✅ Đăng nhập thành công!\nChào mừng ${user.email}`);
                 window.location.href = "index.html";
             } else {
+                console.log("❌ Không tìm thấy user nào khớp");
                 errorEl.textContent = "❌ Sai email hoặc mật khẩu!";
             }
         }
 
+        // Nhấn Enter để đăng nhập
         document.addEventListener('keypress', (e) => {
             if (e.key === "Enter") login();
         });
 
+        // Nếu đã đăng nhập thì chuyển thẳng
         if (localStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = "index.html";
         }
 
-        window.onload = () => document.getElementById('email').focus();
+        window.onload = () => {
+            document.getElementById('email').focus();
+        };
     </script>
 </body>
 </html>
