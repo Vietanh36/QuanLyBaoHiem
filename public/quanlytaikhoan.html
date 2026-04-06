@@ -94,7 +94,7 @@
             margin-bottom: 5px;
             font-weight: 500;
         }
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -105,11 +105,6 @@
             gap: 12px;
             justify-content: flex-end;
             margin-top: 20px;
-        }
-        .header-info {
-            text-align: right;
-            margin-bottom: 15px;
-            font-size: 15px;
         }
     </style>
 </head>
@@ -170,7 +165,7 @@
         </div>
     </div>
 
-    <!-- Popup thay đổi mật khẩu -->
+    <!-- Modal Đổi mật khẩu -->
     <div id="changePassModal" class="modal">
         <div class="modal-content">
             <h2>🔑 Thay đổi mật khẩu</h2>
@@ -243,19 +238,19 @@
 
             // Kiểm tra email đã tồn tại
             if (users.some(u => u.email === email)) {
-                alert("Email này đã tồn tại!");
+                alert("❌ Email này đã tồn tại trong hệ thống!");
                 return;
             }
 
             users.push({
                 email: email,
-                password: password,
+                password: password,        // Lưu mật khẩu rõ để đăng nhập được
                 role: role,
                 createdAt: new Date().toISOString()
             });
 
             localStorage.setItem('users', JSON.stringify(users));
-            alert("✅ Đăng ký tài khoản thành công!");
+            alert(`✅ Đăng ký tài khoản ${email} thành công!`);
             closeRegisterModal();
             loadUsers();
         }
@@ -294,6 +289,11 @@
 
         // ==================== XÓA TÀI KHOẢN ====================
         function deleteUser(email) {
+            if (email === 'admin1@ad.com') {
+                alert("❌ Không được xóa tài khoản Admin chính!");
+                return;
+            }
+
             if (!confirm(`Bạn có chắc muốn xóa tài khoản ${email}?`)) return;
 
             let users = JSON.parse(localStorage.getItem('users')) || [];
