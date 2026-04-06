@@ -74,10 +74,6 @@
             const password = document.getElementById('password').value.trim();
             const errorEl = document.getElementById('error');
 
-            console.log("=== ĐANG THỬ ĐĂNG NHẬP ===");
-            console.log("Email:", email);
-            console.log("Password:", password);
-
             if (!email || !password) {
                 errorEl.textContent = "❌ Vui lòng nhập email và mật khẩu!";
                 return;
@@ -85,24 +81,11 @@
 
             let users = JSON.parse(localStorage.getItem('users')) || [];
 
-            // Tự động tạo dữ liệu mẫu nếu localStorage rỗng
             if (users.length === 0) {
                 users = [
-                    {
-                        email: "admin1@ad.com",
-                        password: "123456",
-                        role: "admin",
-                        createdAt: new Date().toISOString()
-                    },
-                    {
-                        email: "nv1@nv.com",
-                        password: "123456",
-                        role: "user",
-                        createdAt: new Date().toISOString()
-                    }
+                    { email: "admin1@ad.com", password: "123456", role: "admin", createdAt: new Date().toISOString() }
                 ];
                 localStorage.setItem('users', JSON.stringify(users));
-                console.log("Đã tạo dữ liệu mẫu:", users);
             }
 
             const user = users.find(u => 
@@ -110,16 +93,20 @@
             );
 
             if (user) {
-                console.log("✅ Đăng nhập thành công:", user);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('role', user.role);
                 localStorage.setItem('username', user.email);
                 localStorage.setItem('email', user.email);
 
                 alert(`✅ Đăng nhập thành công!\nChào mừng ${user.email}`);
-                window.location.href = "index.html";
+
+                // Chuyển hướng theo vai trò
+                if (user.role === 'admin') {
+                    window.location.href = "index.html";        // Admin → Trang chủ
+                } else {
+                    window.location.href = "danh-sach-bao-hiem.html"; // Nhân viên → Danh sách bảo hiểm
+                }
             } else {
-                console.log("❌ Không tìm thấy user khớp");
                 errorEl.textContent = "❌ Sai email hoặc mật khẩu!";
             }
         }
@@ -129,12 +116,15 @@
         });
 
         if (localStorage.getItem('isLoggedIn') === 'true') {
-            window.location.href = "index.html";
+            const role = localStorage.getItem('role');
+            if (role === 'admin') {
+                window.location.href = "index.html";
+            } else {
+                window.location.href = "danh-sach-bao-hiem.html";
+            }
         }
 
-        window.onload = () => {
-            document.getElementById('email').focus();
-        };
+        window.onload = () => document.getElementById('email').focus();
     </script>
 </body>
 </html>

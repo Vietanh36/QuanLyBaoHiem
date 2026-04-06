@@ -119,7 +119,6 @@
             resize: vertical;
         }
 
-        /* Thông báo sắp hết hạn */
         .notification-bar {
             background: #d32f2f;
             color: white;
@@ -181,14 +180,12 @@
             </div>
         </header>
 
-        <!-- Thông báo đỏ sắp hết hạn -->
         <div id="notificationBar" class="notification-bar">
             🚨 CÓ <span id="countExpiring" style="font-size:22px; font-weight:bold"></span> 
             BẢO HIỂM SẮP HẾT HẠN (dưới 30 ngày)
             <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
         </div>
 
-        <!-- Phần tìm kiếm -->
         <div class="search-container">
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:0 30px;">
                 <input type="text" id="searchInput" class="search-box" style="flex:1;"
@@ -270,7 +267,7 @@
                 danhSachBaoHiem = await res.json();
                 renderTable();
                 checkThongBaoDo();
-                applyRolePermissions();   // Áp dụng phân quyền
+                applyRolePermissions();
             } catch (err) {
                 console.error(err);
                 alert("❌ Không tải được dữ liệu từ server!");
@@ -282,7 +279,7 @@
             const currentRole = localStorage.getItem('role');
             
             if (currentRole === 'user') {
-                // Ẩn tất cả nút Sửa và Xóa
+                // Ẩn nút Sửa, Xóa
                 document.querySelectorAll('button').forEach(btn => {
                     const text = btn.textContent.trim();
                     if (text.includes('Sửa') || text.includes('Xóa')) {
@@ -290,15 +287,13 @@
                     }
                 });
 
-                // Ẩn nút "Thêm Bảo Hiểm Mới"
+                // Ẩn nút Thêm Bảo Hiểm Mới
                 const addBtn = Array.from(document.querySelectorAll('button')).find(btn => 
                     btn.textContent.includes('Thêm Bảo Hiểm Mới')
                 );
                 if (addBtn) addBtn.style.display = 'none';
-
-                // Ẩn nút filter trạng thái
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.style.display = 'none');
             }
+            // Nhân viên vẫn giữ chức năng lọc trạng thái và tìm kiếm
         }
 
         function getTrangThai(ngayHetHan) {
