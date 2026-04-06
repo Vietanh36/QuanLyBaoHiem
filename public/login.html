@@ -85,20 +85,20 @@
 
             let users = JSON.parse(localStorage.getItem('users')) || [];
 
-            // Tự động tạo dữ liệu nếu localStorage rỗng
+            // Nếu chưa có dữ liệu → tạo sẵn admin và nhân viên
             if (users.length === 0) {
                 users = [
-                    { 
-                        email: "admin1@ad.com", 
-                        password: "123456", 
-                        role: "admin", 
-                        createdAt: new Date().toISOString() 
+                    {
+                        email: "admin1@ad.com",
+                        password: "123456",
+                        role: "admin",
+                        createdAt: new Date().toISOString()
                     },
-                    { 
-                        email: "nv1@nv.com", 
-                        password: "123456", 
-                        role: "user", 
-                        createdAt: new Date().toISOString() 
+                    {
+                        email: "nv1@nv.com",
+                        password: "123456",
+                        role: "user",
+                        createdAt: new Date().toISOString()
                     }
                 ];
                 localStorage.setItem('users', JSON.stringify(users));
@@ -113,7 +113,7 @@
 
             if (user) {
                 console.log("✅ Đăng nhập thành công:", user);
-                
+
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('role', user.role);
                 localStorage.setItem('username', user.email);
@@ -121,6 +121,7 @@
 
                 alert(`✅ Đăng nhập thành công!\nChào mừng ${user.email}`);
 
+                // Chuyển hướng theo vai trò
                 if (user.role === 'admin') {
                     window.location.href = "index.html";
                 } else {
@@ -132,17 +133,24 @@
             }
         }
 
+        // Nhấn Enter để đăng nhập
         document.addEventListener('keypress', (e) => {
             if (e.key === "Enter") login();
         });
 
+        // Nếu đã đăng nhập thì chuyển thẳng
         if (localStorage.getItem('isLoggedIn') === 'true') {
             const role = localStorage.getItem('role');
-            if (role === 'admin') window.location.href = "index.html";
-            else window.location.href = "danh-sach-bao-hiem.html";
+            if (role === 'admin') {
+                window.location.href = "index.html";
+            } else {
+                window.location.href = "danh-sach-bao-hiem.html";
+            }
         }
 
-        window.onload = () => document.getElementById('email').focus();
+        window.onload = () => {
+            document.getElementById('email').focus();
+        };
     </script>
 </body>
 </html>
