@@ -79,10 +79,9 @@
                 return;
             }
 
-            // Lấy danh sách users từ localStorage
             let users = JSON.parse(localStorage.getItem('users')) || [];
 
-            // Nếu chưa có tài khoản nào, tạo sẵn admin mặc định
+            // Tạo admin mặc định nếu chưa có dữ liệu
             if (users.length === 0) {
                 users = [{
                     email: "admin1@ad.com",
@@ -93,41 +92,32 @@
                 localStorage.setItem('users', JSON.stringify(users));
             }
 
-            // Tìm tài khoản khớp (hỗ trợ cả admin và nhân viên)
             const user = users.find(u => 
                 u.email.toLowerCase() === email && u.password === password
             );
 
             if (user) {
-                // Lưu thông tin đăng nhập
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('role', user.role);
                 localStorage.setItem('username', user.email);
                 localStorage.setItem('email', user.email);
 
                 alert(`✅ Đăng nhập thành công!\nChào mừng ${user.email}`);
-                
-                // Chuyển về trang chủ
                 window.location.href = "index.html";
             } else {
                 errorEl.textContent = "❌ Sai email hoặc mật khẩu!";
             }
         }
 
-        // Nhấn Enter để đăng nhập
         document.addEventListener('keypress', (e) => {
             if (e.key === "Enter") login();
         });
 
-        // Nếu đã đăng nhập thì chuyển thẳng về trang chủ
         if (localStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = "index.html";
         }
 
-        // Focus vào ô email khi tải trang
-        window.onload = () => {
-            document.getElementById('email').focus();
-        };
+        window.onload = () => document.getElementById('email').focus();
     </script>
 </body>
 </html>

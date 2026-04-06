@@ -46,7 +46,6 @@
         .btn-add { background: #007bff; }
         .btn-logout { background: #dc3545; }
 
-        /* Phần tìm kiếm sticky */
         .search-container {
             position: sticky;
             top: 20px;
@@ -120,7 +119,7 @@
             resize: vertical;
         }
 
-        /* Thông báo đỏ cho sắp hết hạn */
+        /* Thông báo sắp hết hạn */
         .notification-bar {
             background: #d32f2f;
             color: white;
@@ -182,14 +181,14 @@
             </div>
         </header>
 
-        <!-- Thông báo đỏ cho sắp hết hạn -->
+        <!-- Thông báo đỏ sắp hết hạn -->
         <div id="notificationBar" class="notification-bar">
             🚨 CÓ <span id="countExpiring" style="font-size:22px; font-weight:bold"></span> 
             BẢO HIỂM SẮP HẾT HẠN (dưới 30 ngày)
             <button onclick="hideNotification()" style="margin-left:auto; background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
         </div>
 
-        <!-- Phần tìm kiếm sticky -->
+        <!-- Phần tìm kiếm -->
         <div class="search-container">
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:0 30px;">
                 <input type="text" id="searchInput" class="search-box" style="flex:1;"
@@ -237,7 +236,7 @@
         </div>
     </div>
 
-    <!-- Popup Sửa -->
+    <!-- Modal Sửa -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h2>✏️ Sửa Thông Tin Bảo Hiểm</h2>
@@ -270,10 +269,35 @@
                 const res = await fetch(API_URL);
                 danhSachBaoHiem = await res.json();
                 renderTable();
-                checkThongBaoDo();   // Kiểm tra và hiển thị thông báo đỏ
+                checkThongBaoDo();
+                applyRolePermissions();   // Áp dụng phân quyền
             } catch (err) {
                 console.error(err);
                 alert("❌ Không tải được dữ liệu từ server!");
+            }
+        }
+
+        // ==================== PHÂN QUYỀN ====================
+        function applyRolePermissions() {
+            const currentRole = localStorage.getItem('role');
+            
+            if (currentRole === 'user') {
+                // Ẩn tất cả nút Sửa và Xóa
+                document.querySelectorAll('button').forEach(btn => {
+                    const text = btn.textContent.trim();
+                    if (text.includes('Sửa') || text.includes('Xóa')) {
+                        btn.style.display = 'none';
+                    }
+                });
+
+                // Ẩn nút "Thêm Bảo Hiểm Mới"
+                const addBtn = Array.from(document.querySelectorAll('button')).find(btn => 
+                    btn.textContent.includes('Thêm Bảo Hiểm Mới')
+                );
+                if (addBtn) addBtn.style.display = 'none';
+
+                // Ẩn nút filter trạng thái
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.style.display = 'none');
             }
         }
 
@@ -336,31 +360,6 @@
             });
         }
 
-        // ==================== THÔNG BÁO ĐỎ - SẮP HẾT HẠN DƯỚI 30 NGÀY ====================
-        function checkThongBaoDo() {
-            const today = new Date();
-            let count = 0;
-
-            danhSachBaoHiem.forEach(item => {
-                const diffDays = Math.ceil((new Date(item.ngayhethan || item.ngayHetHan) - today) / (1000 * 60 * 60 * 24));
-                if (diffDays > 0 && diffDays <= 30) count++;
-            });
-
-            const bar = document.getElementById('notificationBar');
-            const countEl = document.getElementById('countExpiring');
-
-            if (count > 0) {
-                countEl.textContent = count;
-                bar.style.display = 'flex';
-            } else {
-                bar.style.display = 'none';
-            }
-        }
-
-        function hideNotification() {
-            document.getElementById('notificationBar').style.display = 'none';
-        }
-
         // ==================== NOTE INLINE ====================
         function editNoteInline(cell, id) {
             const currentNote = cell.textContent.trim() === '(Chưa có)' ? '' : cell.textContent.trim();
@@ -384,11 +383,11 @@
                         alert("✅ Note đã được lưu thành công!");
                         await loadData();
                     } else {
-                        alert("❌ Lưu note thất bại! Server trả về lỗi");
+                        alert("❌ Lưu note thất bại!");
                     }
                 } catch (err) {
                     console.error(err);
-                    alert("❌ Không kết nối được với server khi lưu note");
+                    alert("❌ Không kết nối được với server");
                 }
             };
 
@@ -551,6 +550,30 @@
             link.download = `BaoHiem_Oto_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
             alert("✅ Đã xuất file Excel thành công!");
+        }
+
+        function checkThongBaoDo() {
+            const today = new Date();
+            let count = 0;
+
+            danhSachBaoHiem.forEach(item => {
+                const diffDays = Math.ceil((new Date(item.ngayhethan || item.ngayHetHan) - today) / (1000 * 60 * 60 * 24));
+                if (diffDays > 0 && diffDays <= 30) count++;
+            });
+
+            const bar = document.getElementById('notificationBar');
+            const countEl = document.getElementById('countExpiring');
+
+            if (count > 0) {
+                countEl.textContent = count;
+                bar.style.display = 'flex';
+            } else {
+                bar.style.display = 'none';
+            }
+        }
+
+        function hideNotification() {
+            document.getElementById('notificationBar').style.display = 'none';
         }
 
         function switchToHome() { window.location.href = "index.html"; }
