@@ -84,16 +84,33 @@
             }
 
             let users = JSON.parse(localStorage.getItem('users')) || [];
-            console.log("Danh sách users trong localStorage:", users);
 
-            // Tìm user khớp
+            // Tự động tạo dữ liệu mẫu nếu localStorage rỗng
+            if (users.length === 0) {
+                users = [
+                    {
+                        email: "admin1@ad.com",
+                        password: "123456",
+                        role: "admin",
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        email: "nv1@nv.com",
+                        password: "123456",
+                        role: "user",
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                localStorage.setItem('users', JSON.stringify(users));
+                console.log("Đã tạo dữ liệu mẫu:", users);
+            }
+
             const user = users.find(u => 
                 u.email.toLowerCase() === email && u.password === password
             );
 
             if (user) {
-                console.log("✅ Tìm thấy user:", user);
-                
+                console.log("✅ Đăng nhập thành công:", user);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('role', user.role);
                 localStorage.setItem('username', user.email);
@@ -102,17 +119,15 @@
                 alert(`✅ Đăng nhập thành công!\nChào mừng ${user.email}`);
                 window.location.href = "index.html";
             } else {
-                console.log("❌ Không tìm thấy user nào khớp");
+                console.log("❌ Không tìm thấy user khớp");
                 errorEl.textContent = "❌ Sai email hoặc mật khẩu!";
             }
         }
 
-        // Nhấn Enter để đăng nhập
         document.addEventListener('keypress', (e) => {
             if (e.key === "Enter") login();
         });
 
-        // Nếu đã đăng nhập thì chuyển thẳng
         if (localStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = "index.html";
         }
