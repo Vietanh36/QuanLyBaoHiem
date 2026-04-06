@@ -85,21 +85,11 @@
 
             let users = JSON.parse(localStorage.getItem('users')) || [];
 
-            // Nếu localStorage rỗng → tạo dữ liệu mẫu
+            // Nếu rỗng thì tạo dữ liệu mẫu (admin + nv)
             if (users.length === 0) {
                 users = [
-                    {
-                        email: "admin1@ad.com",
-                        password: "123456",
-                        role: "admin",
-                        createdAt: new Date().toISOString()
-                    },
-                    {
-                        email: "nv1@nv.com",
-                        password: "123456",
-                        role: "user",
-                        createdAt: new Date().toISOString()
-                    }
+                    { email: "admin1@ad.com", password: "123456", role: "admin", createdAt: new Date().toISOString() },
+                    { email: "nv1@nv.com", password: "123456", role: "user", createdAt: new Date().toISOString() }
                 ];
                 localStorage.setItem('users', JSON.stringify(users));
                 console.log("Đã tạo dữ liệu mẫu:", users);
@@ -139,16 +129,11 @@
 
         if (localStorage.getItem('isLoggedIn') === 'true') {
             const role = localStorage.getItem('role');
-            if (role === 'admin') {
-                window.location.href = "index.html";
-            } else {
-                window.location.href = "danh-sach-bao-hiem.html";
-            }
+            if (role === 'admin') window.location.href = "index.html";
+            else window.location.href = "danh-sach-bao-hiem.html";
         }
 
-        window.onload = () => {
-            document.getElementById('email').focus();
-        };
+        window.onload = () => document.getElementById('email').focus();
     </script>
 </body>
 </html>
