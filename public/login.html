@@ -55,28 +55,17 @@
             margin: 15px 0; 
             font-weight: 500;
         }
-        .demo {
-            font-size: 13px;
-            color: #666;
-            margin-top: 25px;
-            line-height: 1.5;
-        }
     </style>
 </head>
 <body>
     <div class="login-box">
         <h2>🔐 Đăng Nhập Hệ Thống</h2>
         
-        <input type="email" id="email" placeholder="Nhập email" value="admin1@ad.com">
+        <input type="email" id="email" placeholder="Nhập email">
         <input type="password" id="password" placeholder="Nhập mật khẩu">
 
         <button onclick="login()">Đăng Nhập</button>
         <div id="error" class="error"></div>
-
-        <div class="demo">
-            <strong>Tài khoản mặc định:</strong><br>
-            admin1@ad.com / 123456
-        </div>
     </div>
 
     <script>
@@ -93,7 +82,7 @@
             // Lấy danh sách users từ localStorage
             let users = JSON.parse(localStorage.getItem('users')) || [];
 
-            // Nếu chưa có users nào, tạo tài khoản admin mặc định
+            // Nếu chưa có tài khoản nào, tạo sẵn admin mặc định
             if (users.length === 0) {
                 users = [{
                     email: "admin1@ad.com",
@@ -104,7 +93,7 @@
                 localStorage.setItem('users', JSON.stringify(users));
             }
 
-            // Tìm tài khoản khớp
+            // Tìm tài khoản khớp (hỗ trợ cả admin và nhân viên)
             const user = users.find(u => 
                 u.email.toLowerCase() === email && u.password === password
             );
@@ -118,7 +107,7 @@
 
                 alert(`✅ Đăng nhập thành công!\nChào mừng ${user.email}`);
                 
-                // CHUYỂN HƯỚNG VỀ TRANG CHỦ index.html như bạn yêu cầu
+                // Chuyển về trang chủ
                 window.location.href = "index.html";
             } else {
                 errorEl.textContent = "❌ Sai email hoặc mật khẩu!";
